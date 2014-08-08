@@ -1,0 +1,8 @@
+
+#/min
+
+*.conf
+
+*.sublime-*
+
+/node_modules

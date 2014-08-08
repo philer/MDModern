@@ -1,0 +1,413 @@
+@charset "UTF-8";
+
+// vars
+@defaultLineHeight: 1.3rem;
+@highlightBg: rgba(125, 125, 125, .2);
+
+@panelHeight: 5rem;
+@panelBgColor: #111;
+@panelBorder: 1px solid #292929;
+@panelShadow: 1px 1px 5px rgba(0,0,0,.5);
+
+@loginBoxHeight: 10rem;
+@loginBoxWidth: 26rem;
+@loginInputHeight: 2.5rem;
+
+*, a, input, button {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0 solid transparent;
+  outline-width: 0; outline-color: transparent;
+  
+  background-color: transparent;
+  color: inherit;
+  
+  font-family: inherit;
+  font-size: 1em;
+  line-height: @defaultLineHeight;
+  
+  list-style-type: none;
+}
+a, button {
+  cursor: pointer;
+  transition-duration: .3s;
+  transition-property:
+    color,
+    background-color,
+    border-color,
+    opacity,
+    text-shadow,
+    box-shadow;
+}
+li.selected {
+  background-color: @highlightBg;
+}
+button, input {
+  &::-moz-focus-inner {
+    padding: 0;
+    border-width: 0;
+  }
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  font-family: "Liberation mono", monospace;
+  color: #ddd;
+  text-shadow: 1px 1px 0 black;
+  background: #171717 url("../img/bg.png") repeat;
+}
+
+#wrapper { z-index: 1000; }
+#panel   { z-index: 2000; }
+
+#wrapper {
+  position: absolute;
+  // top: 0;
+  top: @panelHeight;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // background: radial-gradient(ellipse,
+  //   rgba(255,255,255,.1) 0%,
+  //   rgba(255,255,255,.0) 50%,
+  //   rgba(255,255,255,0) 100%
+  //   );
+  // background: #171717 center center / cover url("file:///home/gandalf/pics/wallpapers/Green_nature_macro_ginkgo_foliage_herbs_2560x1600.jpg");
+}
+#bg0, #bg1 {
+  position: absolute;
+  top: @panelHeight;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-position: center center;
+  background-size: cover;
+  .filename {
+    position: absolute;
+    left: .5em;
+    bottom: .5em;
+    opacity: .5;
+    &:hover { opacity: 1; }
+  }
+}
+
+#panel {
+  position: relative;
+  height: @panelHeight;
+  line-height: @panelHeight;
+  background-color: @panelBgColor;
+  box-shadow: @panelShadow;
+  
+  h1,
+  nav,
+  > ul,
+  > ul > li,
+  > ul > li > a,
+  > ul > li > a > span {
+    display: inline-block;
+    height: @panelHeight;
+    line-height: @panelHeight;
+    vertical-align: middle;
+  }
+  > ul {
+    border-right: @panelBorder;
+    // border-left: 1px solid black;
+    > li {
+      // border-right: 1px solid black;
+      border-left: @panelBorder;
+      > a {
+        min-width: @panelHeight;
+        padding: 0 1rem;
+        font-size: 1.2rem;
+        span {
+          max-width: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition-duration: .3s;
+          transition-property: max-width, opacity;
+        }
+      }
+    }
+  }
+  
+  a:hover {
+    background-color: rgba(125,125,125,.2);
+    span {
+      max-width: 10em;
+      opacity: 1;
+    }
+  }
+  .fa {
+    font-size: 1.5rem;
+    line-height: @panelHeight;
+    vertical-align: middle;
+    padding: 0 .5em;
+  }
+  
+  h1 {
+    position: absolute;
+    left: .5*@panelHeight;
+    font-size: 1.2rem;
+  }
+  
+  #system {
+    position: absolute;
+    right: .5*@panelHeight;
+  }
+}
+
+#sessionNav {
+  z-index: 700;
+  position: relative;
+  min-width: 3*@panelHeight;
+}
+#sessionLabel, #session {
+  z-index: 1;
+  position: relative;
+  display: block;
+  height: @defaultLineHeight;
+  line-height: @defaultLineHeight;
+  box-sizing: content-box;
+  background-color: @panelBgColor;
+  border: @panelBorder;
+  border-width: 0 1px;
+}
+#sessionLabel {
+  padding-top: .5*@panelHeight - @defaultLineHeight;
+}
+#session {
+  padding: 0 1rem .5*@panelHeight - @defaultLineHeight;
+}
+#sessions, #session {
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+#sessions {
+  z-index: 0;
+  position:relative;
+  top: -20rem;
+  // max-height: 0;
+  opacity: 0;
+  transition-duration: .5s;
+  transition-property: top, opacity, border, box-shadow;
+  
+  overflow: hidden;
+  background-color: @panelBgColor;
+  
+  li {
+    margin: 1px 0;
+    &.selected {
+      background-color: rgba(125,125,125,.2);
+    }
+    a {
+      display: block;
+      padding: .66em 1em;
+    }
+  }
+}
+#sessionNav:hover #sessions {
+  // max-height: 30em;
+  top: 0;
+  opacity: 1;
+  border-bottom: 1rem solid @panelBgColor;
+  box-shadow: @panelShadow;
+}
+
+
+/*** LOGIN BOX ***/
+
+#loginbox,
+#loginbox form {
+  height: @loginBoxHeight;
+  width: @loginBoxWidth;
+}
+#loginbox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -@loginBoxHeight/2 0 0 -@loginBoxWidth/2;
+  // overflow: hidden;
+  box-sizing: content-box;
+  border: 1em solid rgba(20, 20, 20, .66);
+  box-shadow: /*0 0 5px rgba(0,0,0,.66),
+              0 0 0 5px rgba(25,25,25,.66),/**/
+              1px 1px 7px rgba(0,0,0,.5),
+              0 0 3em rgba(0,0,0,.33);
+  
+  &.hasface {
+    width: @loginBoxWidth + @loginBoxHeight;
+    margin-left: -.5*(@loginBoxWidth + @loginBoxHeight);
+    // form {
+    //   border-top-left-radius: 0;
+    //   border-bottom-left-radius: 0;
+    // }
+  }
+
+  &, #face, form {
+    transition-duration: .3s;
+    transition-property: width, left, right, border-radius, padding, margin;
+  }
+  #face, form {
+    position: absolute;
+    top: 0;
+  }
+  #face {
+    left: 0;
+    height: @loginBoxHeight;
+    width: @loginBoxHeight;
+  }
+  form {
+    right: 0;
+    padding: 2em;
+    text-align: center;
+    background-color: #1D1D1D;
+    
+    fieldset {
+      position: relative;
+      display: block;
+      width: @loginBoxWidth - 2*2rem;
+      height: @loginInputHeight;
+      margin: -1px 0 1rem -1px;
+      box-sizing: content-box;
+      font-size: 1.2rem;
+      background: linear-gradient(to bottom, #131313 0, #191919 100%) repeat scroll 0% 0% transparent;
+      border-width: 1px;
+      border-color: #111 #242424 #242424 #111;
+    }
+    
+    input, label, button, #userlist-toggle {
+      display: block;
+      width: @loginInputHeight;
+      height: @loginInputHeight;
+      line-height: @loginInputHeight;
+    }
+    label, button, #userlist-toggle {
+      background-color: rgba(15,15,15,.7);
+      // background-color: #111;
+      color: #777;
+      // text-shadow: -1px -1px 0 #000
+    }
+    input, label {
+      float: left;
+      box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .33);
+    }
+    button, #userlist-toggle {
+      float: right;
+      box-shadow: inset -1px 1px 2px rgba(0, 0, 0, .33);
+      &:hover { color: inherit; }
+    }
+    .fa {
+      line-height: @loginInputHeight;
+    }
+    input {
+      width: @loginBoxWidth - 2*2rem - 2*@loginInputHeight;
+      padding: 0 .66rem;
+      box-shadow: inset 1px 1px 4px rgba(0, 0, 0, .33);
+    }
+    
+    #username, ul {
+      text-align: left;
+    }
+    ul {
+      position: absolute;
+      z-index: 1;
+      top: @loginInputHeight;
+      box-sizing: content-box;
+      width: @loginBoxWidth - 2*2rem;
+      padding: .25rem 1px;
+      margin: 1px -1px;
+      
+      background-color: #161616;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, .5);
+      
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition-duration: .3s;
+      transition-property: visibility, opacity, max-height;
+      
+      &.expanded {
+        opacity: 1;
+        max-height: 20em;
+      }
+      
+      li {
+        &:hover {
+          background-color: @highlightBg;
+        }
+        &.loggedIn a::after {
+          content: "Logged In";
+          display: inline-block;
+          float: right;
+          margin-right: .5rem;
+          line-height: 2rem;
+          vertical-align: middle;
+          color: #8f8;
+          font-variant: small-caps;
+          word-spacing: -.5em;
+        }
+        a {
+          display: block;
+          padding: .25rem .5rem;
+          margin: 1px -1px;
+          img, .fa {
+            display: inline-block;
+            margin-right: .5em;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            vertical-align: middle;
+            text-align: center;
+            background-color: #222;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#msg {
+  position: absolute;
+  top: 5rem;
+  width: 60%;
+  margin: 0 20%;
+  font-size: 1.2em;
+  line-height: 3rem;
+  background: linear-gradient(to bottom, #1A1A1A 0, #2F2F2F 100%) repeat scroll 0% 0% transparent;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, .4);
+  cursor: pointer;
+  &.error {
+    background: linear-gradient(to bottom, #5F1F1F 0, #4A0A0A 100%) repeat scroll 0% 0% transparent;
+  }
+}
+
+
+#slideshowControls {
+  position: absolute;
+  height: 2em;
+  line-height: 2em;
+  right: 1em;
+  bottom: 1em;
+  a {
+    padding: 0 .5em;
+    opacity: .5;
+    &:hover { opacity: 1; }
+  }
+}
+
+
+#log {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  text-align: left;
+  overflow: auto;
+  white-space: pre-wrap;
+}
