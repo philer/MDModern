@@ -31,8 +31,8 @@
       settings,
       elems      = [ $("#bg0"), $("#bg1") ],
       topElem    = 0,
+      loader     = new Image(),
       sources,
-      loader,
       currentId,
       intervalId;
   
@@ -40,24 +40,26 @@
   window.slideshow = slideshow;
   
   // pass sources from config file to init
+  $(loader).on("load", showCurrent);
   config.require("slideshow.conf", init);
   
   
   /// functions ///
   
   function init(cfg) {
-    sources = cfg.backgrounds;
+    settings = $.extend(defaultSettings, cfg);
+    sources  = settings.backgrounds;
+    
     if (debug) debug.log("Starting slideshow with " + sources.length + " images");
     
     // 1 image shortcut
     if (sources.length == 1) {
       setImage(0);
       $("#slideshowControls").hide();
-      return slideshow;
+      return;
     }
     
     // config
-    settings = $.extend(defaultSettings, cfg);
     if (settings.shuffle) {
       slideshow.shuffle();
     }
@@ -65,10 +67,6 @@
       elems[0].filenameElem = $(".filename", elems[0]);
       elems[1].filenameElem = $(".filename", elems[1]);
     }
-    
-    // slideshow loader init
-    loader = new Image();
-    $(loader).on("load", showCurrent);
     
     setImage(0);
     slideshow.start();
