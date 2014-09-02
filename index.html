@@ -33,10 +33,12 @@
       <h1 class="lsb_distrib_description">{distro}</h1>
       
       <nav id="sessionNav">
+        
         <div id="sessionLabel">Session</div>
         <div id="session">{session}</div>
         <ul id="sessions"></ul>
-      </nav>
+      
+      </nav><span id="countdown"></span>
       
       <ul id="system">
         <li id="quit">
@@ -57,6 +59,7 @@
           </a>
         </li>
       </ul>
+      
     </div>
     
     <div id="bg0"><span class="filename"></span></div>
@@ -96,13 +99,13 @@
     <script>
       // test data
       if (debug) {
-        mdm_add_user("philer", "Philipp Miller", "");
-        mdm_add_user("userx", "User X", "Logged in");
-        mdm_set_current_user("philer");
-        mdm_add_session("Cinnamon");
-        mdm_add_session("Mate");
-        mdm_add_session("i3");
-        mdm_set_current_session("Cinnamon");
+        // mdm_add_user("philer", "Philipp Miller", "");
+        // mdm_add_user("userx", "User X", "Logged in");
+        // mdm_set_current_user("philer");
+        // mdm_add_session("Cinnamon");
+        // mdm_add_session("Mate");
+        // mdm_add_session("i3");
+        // mdm_set_current_session("Cinnamon");
         // mdm_error("test");
       }
     </script>

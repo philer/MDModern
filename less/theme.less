@@ -107,7 +107,9 @@ html, body {
   > ul,
   > ul > li,
   > ul > li > a,
-  > ul > li > a > span {
+  > ul > li > a > span,
+  #countdown
+  {
     display: inline-block;
     height: @panelHeight;
     line-height: @panelHeight;
@@ -157,6 +159,16 @@ html, body {
   #system {
     position: absolute;
     right: .5*@panelHeight;
+  }
+  
+  #countdown {
+    font-size: 1.75em;
+    font-weight: bold;
+    line-height: @panelHeight;
+    width: @panelHeight;
+    
+    // keep sessions aligned to center
+    margin-right: -@panelHeight;
   }
 }
 
@@ -230,10 +242,12 @@ html, body {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin: -@loginBoxHeight/2 0 0 -@loginBoxWidth/2;
-  // overflow: hidden;
+  
+  // pull back half the box size plus border width
+  margin: -(1rem + @loginBoxHeight/2) 0 0 -(1rem + @loginBoxWidth/2);
+  
   box-sizing: content-box;
-  border: 1em solid rgba(20, 20, 20, .66);
+  border: 1rem solid rgba(20, 20, 20, .66);
   box-shadow: /*0 0 5px rgba(0,0,0,.66),
               0 0 0 5px rgba(25,25,25,.66),/**/
               1px 1px 7px rgba(0,0,0,.5),

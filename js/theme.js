@@ -22,6 +22,7 @@
       sessionsUl     = $("#sessions"),
       sessions       = [],
       selectedSession,
+      countdownElem  = $("#countdown"),
       msgBox         = $("#msg");
   
   // custom debug logging
@@ -41,6 +42,7 @@
      .on("restartHidden",   function() { $("#restart").hide(); })
      .on("suspendHidden",   function() { $("#suspend").hide(); })
      .on("quitHidden",      function() { $("#quit").hide(); })
+     .on("loginCountdown",  updateCountdown)
      .on("error",           showMsg);
      // .on("error mdm.message mdm.timedMessage", showMsg);
   
@@ -146,16 +148,21 @@
    * Set a user as selected for login
    * by passing a user object
    * 
-   * @param  {event} evt        optional mdm or click event
-   * @param  {string} username  user object
+   * @param  {event} evt   optional mdm or click event
+   * @param  {string} user user object
    */
   function selectUser(evt, user) {
     selectedUser = user;
-    if (!$(evt.target).is(usernameInput)) usernameInput.val(user.name);
+    if (!usernameInput.is(evt.target)) {
+      usernameInput.val(user.name);
+    }
     users.forEach(function(usr) {
-      if (usr.name == user.name)
+      if (usr.name == user.name) {
         usr.li.addClass("selected");
-      else usr.li.removeClass("selected");
+      }
+      else {
+        usr.li.removeClass("selected");
+      }
     });
     updateFace(user);
   }
@@ -223,6 +230,11 @@
     a.click(function() {
       selectSession(null, session);
     });
+    
+    // show first session by default
+    if (!selectedSession) {
+      selectSession(null, session);
+    }
   }
   
 
@@ -241,6 +253,15 @@
         sess.li.addClass("selected");
       else sess.li.removeClass("selected");
     });
+  }
+  
+  /**
+   * Make countdown times visible and set time
+   * @param  {event} evt   optional
+   * @param  {int}   time  time remaining until automatic login
+   */
+  function updateCountdown(evt, time) {
+    countdownElem.text(time);
   }
   
   /**

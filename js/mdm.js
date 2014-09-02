@@ -40,11 +40,11 @@
   
   // some listeners used by the mdm module
   mdm.on("userAdded", function(evt, user) {
-          usernames.push(user.name);
-        })
-      .one("userSelected", function(evt, username) {
-          userSelected = true;
-        });
+      usernames.push(user.name);
+    })
+    .one("userSelected", function(evt, username) {
+      userSelected = true;
+    });
   
   /**
    * Attempt a login using the provided data.
@@ -84,6 +84,7 @@
     // additonal safeguard: only send passwords for known users
     // (MDM's replies are kinda unpredictable otherwise)
     if (mdm.userExists(user)) {
+      if (debug) debug.log("MDM: sending username");
       alert("USER###" + user);
       userSelected = true;
     }
@@ -107,6 +108,7 @@
     }
     else {
       mdm.one("passwordPrompt", function() {
+        if (debug) debug.log("MDM: sending password");
         alert("LOGIN###" + password);
       });
     }
@@ -120,6 +122,7 @@
    * @return {mdm}             chainable
    */
   mdm.selectSession = function(session) {
+    if (debug) debug.log("MDM: sending session info");
     alert("SESSION###" + session.name + "###" + session.file);
     return mdm;
   };
@@ -130,6 +133,7 @@
    * @return {mdm}    chainable
    */
   mdm.shutdown = function() {
+    if (debug) debug.log("MDM: sending force-shutdown request");
     alert("FORCE-SHUTDOWN###");
     return mdm;
   };
@@ -140,6 +144,7 @@
    * @return {mdm}    chainable
    */
   mdm.restart = function() {
+    if (debug) debug.log("MDM: sending force-restart request");
     alert("FORCE-RESTART###");
     return mdm;
   };
@@ -150,6 +155,7 @@
    * @return {mdm}    chainable
    */
   mdm.suspend = function() {
+    if (debug) debug.log("MDM: sending force-suspend request");
     alert("FORCE-SUSPEND###");
     return mdm;
   };
@@ -160,6 +166,7 @@
    * @return {mdm}    chainable
    */
   mdm.quit = function() {
+    if (debug) debug.log("MDM: sending quit request");
     alert("QUIT###");
     return mdm;
   };
@@ -241,6 +248,7 @@
   // Called by MDM to show a timed login countdown
   win.mdm_timed = function(message) {
     trigger("timedMessage", message);
+    trigger("loginCountdown", +message.match(/[0-9]+/)[0]);
   };
   
   // Called by MDM to set the welcome message

@@ -28,7 +28,9 @@
    * @return {debug}      chainabl
    */
   debug.log = function(msg) {
-    if (msg === null) return log;
+    if (arguments.length > 1) {
+      msg = Array.prototype.join.call(arguments, ", ");
+    }
     
     var t  = new Date,
         dt = new Date(t - startTime);

@@ -50,6 +50,11 @@ Attach event listeners right to the `mdm` object using `on` or `one`
 "suspendHidden"
 "xdmcpHidden"
 
+// "loginCountdown" event will try to provide the remaining seconds
+// as an integer based on "timedMessage" content.
+"loginCountdown"    Integer seconds
+
+
 // Examples
 mdm.on("clockUpdate", function(message) {
   $("#clock").text(time);
