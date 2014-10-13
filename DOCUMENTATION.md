@@ -10,23 +10,29 @@ The `lsb_release` and `slideshow` modules don't have an interface and are theref
 ### `mdm` Functions:
 Use the following functions to send data to MDM:
 ```JavaScript
-mdm.on(...)                         // see jQuery on (example below)
-mdm.one(...)                        // see jQuery one (example below)
-mdm.login(String|User user, String password[, Object session]) // wrapper function
-mdm.selectUser(String|User user)    // send login user
-mdm.sendPassword(String password)   // send login password
-mdm.selectSession(Object session)   // set login session
-mdm.userExists(String username)     // returns boolean
-mdm.shutdown()                      // shutdown immediately
-mdm.restart()                       // reboot immediately
-mdm.suspend()                       // suspend immediately
-mdm.quit()                          // quit MDM (restarts the greeter)
+mdm.on(...)                           // see jQuery on (example below)
+mdm.one(...)                          // see jQuery one (example below)
+mdm.login(String|User user, String password[, Session session[, Language language]]) // wrapper function
+mdm.getUser(String username)          // returns existing User or null
+mdm.selectUser(String|User user)      // send login user
+mdm.sendPassword(String password)     // send login password
+mdm.getSession(String session_file)   // returns existing Session or null
+mdm.selectSession(Session session)    // set login session
+mdm.getLanguage(String language_file) // returns existing Language or null
+mdm.selectLanguage(Language language) // set login language
+mdm.shutdown()                        // shutdown immediately
+mdm.restart()                         // reboot immediately
+mdm.suspend()                         // suspend immediately
+mdm.quit()                            // quit MDM (restarts the greeter)
 ```
 ### `mdm` Events:
 MDM calls several global functions to add data to the theme's interface.
 The `mdm` module provides an event based wrapper for these functions.
 Attach event listeners right to the `mdm` object using `on` or `one`
 (see jQuery's documentation).
+
+Those events adding or selecting a user, session or language will include an
+object of a respective type that offers the relevant data and some useful methods.
 ```JavaScript
 // Event Name       // Event Data (sent by MDM)
 "enabled"
@@ -34,11 +40,11 @@ Attach event listeners right to the `mdm` object using `on` or `one`
 "usernamePrompt"
 "passwordPrompt"
 "userAdded"         User user
-"sessionAdded"      {name: session_name, file: session_file}
-"languageAdded"     {name: language_name, code: language_code}
-"userSelected"      String username
-"sessionSelected"   {name: session_name, file: session_file}
-"languageSelected"  {name: language_name, code: language_code}
+"userSelected"      User user
+"sessionAdded"      Session session
+"sessionSelected"   Session session
+"languageAdded"     Language language
+"languageSelected"  Language language
 "error"             String message
 "message"           String message
 "timedMessage"      String message
@@ -61,6 +67,7 @@ mdm.on("clockUpdate", function(message) {
 });
 mdm.on("languageAdded", function(language) {
   $("ul#languages").append("<li>" + language.name + "</li>");
+  language.select(); // activate this language for the upcoming session
 });
 ```
 ### `config` Functions:
