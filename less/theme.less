@@ -13,6 +13,18 @@
 @loginBoxWidth: 26rem;
 @loginInputHeight: 2.5rem;
 
+
+/// font awesome
+@faComment: "\f075";
+.font-awesome(@icon: "") {
+  content: @icon;
+  font-family: "FontAwesome";
+  display: inline-block;
+}
+
+
+
+/// RESET
 *, a, input, button {
   margin: 0;
   padding: 0;
@@ -107,7 +119,7 @@ html, body {
   > ul,
   > ul > li,
   > ul > li > a,
-  > ul > li > a > span,
+  // > ul > li > a > span,
   #countdown
   {
     display: inline-block;
@@ -115,34 +127,17 @@ html, body {
     line-height: @panelHeight;
     vertical-align: middle;
   }
-  > ul {
-    border-right: @panelBorder;
-    // border-left: 1px solid black;
-    > li {
-      // border-right: 1px solid black;
-      border-left: @panelBorder;
-      > a {
-        min-width: @panelHeight;
-        padding: 0 1rem;
-        font-size: 1.2rem;
-        span {
-          max-width: 0;
-          overflow: hidden;
-          opacity: 0;
-          transition-duration: .3s;
-          transition-property: max-width, opacity;
-        }
-      }
-    }
+  
+  span {
+    display: inline-block;
+    line-height: 2em;
+    padding: 0 .5em;
   }
   
   a:hover {
     background-color: rgba(125,125,125,.2);
-    span {
-      max-width: 10em;
-      opacity: 1;
-    }
   }
+  
   .fa {
     font-size: 1.5rem;
     line-height: @panelHeight;
@@ -156,9 +151,60 @@ html, body {
     font-size: 1.2rem;
   }
   
-  #system {
+  #menu {
     position: absolute;
     right: .5*@panelHeight;
+    
+    // border-left: 1px solid black;
+    > li {
+      position: relative;
+      // border-right: 1px solid black;
+      border-left: @panelBorder;
+      &:last-child {
+        border-right: @panelBorder;
+      }
+      
+      min-width: @panelHeight;
+      
+      > a {
+        min-width: @panelHeight;
+        padding: 0 1rem;
+        font-size: 1.2rem;
+      }
+    }
+    
+    .tooltip {
+      position: absolute;
+      top: @panelHeight;
+      right: 0;
+      margin-top: 10px;
+      
+      background-color: @panelBgColor;
+      box-shadow: 1px 1px 5px rgba(0,0,0,.4);
+      border-radius: 2px;
+      
+      visibility: hidden;
+      opacity: 0;
+      transition-duration: .5s;
+      transition-delay: .1s;
+      transition-property: top, opacity, visibility;
+      
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: -20px;
+        right: 10px;
+        height: 0;
+        width: 0;
+        border: 10px solid transparent;
+        border-bottom-color: @panelBgColor;
+      }
+    }
+    li:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
   }
   
   #countdown {
@@ -201,7 +247,7 @@ html, body {
 }
 #sessions {
   z-index: 0;
-  position:relative;
+  position: relative;
   top: -20rem;
   // max-height: 0;
   opacity: 0;
@@ -228,6 +274,34 @@ html, body {
   opacity: 1;
   border-bottom: 1rem solid @panelBgColor;
   box-shadow: @panelShadow;
+}
+
+#languageNav {
+  position: relative;
+}
+
+#language{
+  font-size: 1.5em;
+  &:before {
+    .font-awesome(@faComment);
+    padding-right: .33em;
+  }
+}
+#languages {
+  white-space: nowrap;
+  text-align: left;
+  a {
+    display: block;
+    line-height: 2em;
+    margin-bottom: 1px;
+    padding: .5em;
+    
+    .code {
+      opacity: .5;
+      // width: 2em;
+      width: 4em;
+    }
+  }
 }
 
 

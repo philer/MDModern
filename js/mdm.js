@@ -15,13 +15,13 @@
   
   "use strict";
   
-  var mdm              = {},
-     $mdm              = $(mdm),
-      usernames        = [],
-      userSelected     = false;
-  
   // export mdm object into global namespace
-  win.mdm = mdm;
+  var mdm = win.mdm = {},
+     $mdm          = $(mdm),
+      userSelected = false,
+      users        = [],
+      sessions     = [],
+      languages    = [];
   
   /// api functions
   
@@ -37,12 +37,8 @@
    */
   mdm.one = $mdm.one.bind($mdm);
   
-  
-  // some listeners used by the mdm module
-  mdm.on("userAdded", function(evt, user) {
-      usernames.push(user.name);
-    })
-    .one("userSelected", function(evt, username) {
+  // listener used by the mdm module
+  mdm.one("userSelected", function(evt, username) {
       userSelected = true;
     });
   
@@ -52,25 +48,32 @@
    * 
    * @param  {String|User} user      username or User object
    * @param  {String}      password
-   * @param  {Object}      session   session object
    * @return {mdm}                   chainable
    */
-  mdm.login = function(user, password, session) {
-    if (session) mdm.selectSession(session);
+  mdm.login = function(user, password, session, language) {
+    if (session) {
+      mdm.selectSession(session);
+    }
+    if (language) {
+      mdm.selectLanguage(language);
+    }
     return mdm
       .selectUser(user)
       .sendPassword(password);
   };
   
   /**
-   * Check if a given user exists, i.e. if the username
-   * has been added by MDM.
+   * Find an existing User by his username
    * 
-   * @param  {String}  username
-   * @return {boolean}
+   * @param  {String} username
+   * @return {User}
    */
-  mdm.userExists = function(username) {
-    return usernames.indexOf(username) !== -1;
+  mdm.getUser = function(username) {
+    for (var i = 0, len = users.length ; i < len ; ++i) {
+      if (users[i].name === "" + username) {
+        return users[i];
+      }
+    }
   };
   
   /**
@@ -83,7 +86,7 @@
     
     // additonal safeguard: only send passwords for known users
     // (MDM's replies are kinda unpredictable otherwise)
-    if (mdm.userExists(user)) {
+    if (mdm.getUser(user)) {
       if (debug) debug.log("MDM: sending username");
       alert("USER###" + user);
       userSelected = true;
@@ -116,16 +119,58 @@
   };
   
   /**
+   * Find an existing Session by its filen ame
+   * 
+   * @param  {String}  session_file file name
+   * @return {Session}
+   */
+  mdm.getSession = function(session_file) {
+    for (var i = 0, len = sessions.length ; i < len ; ++i) {
+      if (sessions[i].file === "" + session_file) {
+        return sessions[i];
+      }
+    }
+  };
+  
+  /**
    * Set the session to log in into.
    * 
-   * @param  {Object} session
+   * @param  {Session} session
    * @return {mdm}             chainable
    */
   mdm.selectSession = function(session) {
     if (debug) debug.log("MDM: sending session info");
     alert("SESSION###" + session.name + "###" + session.file);
+    trigger("sessionSelected", session);
     return mdm;
   };
+  
+  /**
+   * Find an existing Language by its (full) code
+   * 
+   * @param  {String}   code e.g. "en_us.UTF-8"
+   * @return {Language}
+   */
+  mdm.getLanguage = function(code) {
+    for (var i = 0, len = languages.length ; i < len ; ++i) {
+      if (languages[i].code === "" + code) {
+        return languages[i];
+      }
+    }
+  };
+  
+  /**
+   * Set the language for this session
+   * 
+   * @param  {Language} language
+   * @return {mdm}               chainable
+   */
+  mdm.selectLanguage = function(language) {
+    if (debug) debug.log("MDM: sending language info");
+    alert("LANGUAGE###" + language.code);
+    trigger("languageSelected", language);
+    return mdm;
+  }
   
   /**
    * Shutdown immediately
@@ -189,6 +234,167 @@
   };
   
   
+  /// MODELS
+  
+  /**
+   * Represents a user.
+   * 
+   * @param {string} username
+   * @param {string} gecos     full name etc.
+   * @param {string} status    online?
+   */
+  function User(username, gecos, loggedIn) {
+    
+    /**
+     * login name
+     * 
+     * @type {string}
+     */
+    this.name = username;
+    
+    /**
+     * full name etc.
+     * 
+     * @type {string}
+     */
+    this.gecos = gecos;
+    
+    /**
+     * online loggedIn
+     * 
+     * @type {boolean}
+     */
+    this.loggedIn = !!loggedIn;
+    
+    /**
+     * User's home directory
+     * Set to /home/{username} by default
+     * and then updated using passwd if available
+     * 
+     * @type {String}
+     */
+    this.home = "file:///home/" + username;
+  }
+  User.prototype = {
+    
+    /**
+     * Simple string representation: username
+     * @return {string}
+     */
+    toString: function toString() {
+      return this.name;
+    },
+    
+    /**
+     * Tell MDM to use this user for upcoming login
+     * @return {User} chainable
+     */
+    select: function() {
+      mdm.selectUser(this);
+      return this;
+    }
+    
+  };
+  
+  /**
+   * Represents a session.
+   * 
+   * @param {string} name
+   * @param {string} file
+   */
+  function Session(name, file) {
+    
+    /**
+     * session name
+     * 
+     * @type {String}
+     */
+    this.name = name;
+    
+    /**
+     * session file name
+     * @type {String}
+     */
+    this.file = file;
+    
+  }
+  Session.prototype = {
+    
+    /**
+     * Tell MDM to use this session for upcoming login
+     * @return {Session} chainable
+     */
+    select: function() {
+      mdm.selectSession(this);
+      return this;
+    }
+    
+  };
+  
+  /**
+   * Represents a language.
+   * 
+   * @param {string} name
+   * @param {string} code
+   */
+  function Language(name, code) {
+    
+    /**
+     * Language name
+     * 
+     * @type {String}
+     */
+    this.name = name;
+    
+    /**
+     * Full language code (e.g. en_US.UTF-8)
+     * @type {String}
+     */
+    this.code = code;
+    
+  }
+  Language.prototype = {
+    
+    /**
+     * Tell MDM to use this language for upcoming login
+     * @return {User} chainable
+     */
+    select: function() {
+      mdm.selectLanguage(this);
+      return this;
+    },
+    
+    /**
+     * country specific language code
+     * 
+     * @return {String} e.g. en_US
+     */
+    countryCode: function() {
+      return this.code.split('.')[0];
+    },
+    
+    /**
+     * short language code
+     * 
+     * @return {String} e.g. en
+     */
+    shortCode: function() {
+      return this.code.split('_')[0];
+    },
+    
+    /**
+     * Language encoding as specified by language code
+     * 
+     * @return {String} e.g. UTF-8
+     */
+    charset: function() {
+      return this.code.split('.')[1];
+    }
+    
+  };
+  
+  
+  
   /**
    * The MDM API.
    * These functions are called by MDM from the outside,
@@ -216,25 +422,31 @@
   
   // Called by MDM to add a user to the list of users
   win.mdm_add_user = function(username, gecos, status) {
-    trigger("userAdded", new User(username, gecos, !!status));
+    var user = new User(username, gecos, status);
+    users.push(user);
+    trigger("userAdded", user);
   };
   // Called by MDM to add a session to the list of sessions
   win.mdm_add_session = function(session_name, session_file) {
-    trigger("sessionAdded", {name: session_name, file: session_file});
+    var session = new Session(session_name, session_file);
+    sessions.push(session);
+    trigger("sessionAdded", session);
   };
   // Called by MDM to add a language to the list of languages
   win.mdm_add_language = function(language_name, language_code) {
-    trigger("languageAdded", {name: language_name, code: language_code});
+    var language = new Language(language_name, language_code);
+    languages.push(language);
+    trigger("languageAdded", language);
   };
   
   win.mdm_set_current_user = function(username) {
-    trigger("userSelected", username);
+    trigger("userSelected", mdm.getUser(username));
   };
   win.mdm_set_current_session = function(session_name, session_file) {
-    trigger("sessionSelected", {name: session_name, file: session_file});
+    trigger("sessionSelected", mdm.getSession(session_file));
   };
   win.mdm_set_current_language = function(language_name, language_code) {
-    trigger("languageSelected", {name: language_name, code: language_code});
+    trigger("languageSelected", mdm.getLanguage(language_code));
   };
   
   // Called by MDM to show an error

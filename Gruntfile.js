@@ -16,7 +16,6 @@ module.exports = function(grunt) {
     
     jsFiles: [
       // core modules
-      '<%= dirs.js %>/user.js',
       '<%= dirs.js %>/mdm.js',
       '<%= dirs.js %>/config.js',
       
@@ -24,6 +23,8 @@ module.exports = function(grunt) {
       '<%= dirs.js %>/theme.js',
       
       // optional modules
+      '<%= dirs.js %>/session.js',
+      '<%= dirs.js %>/language.js',
       '<%= dirs.js %>/slideshow.js',
       '<%= dirs.js %>/lsb_release.js',
     ],

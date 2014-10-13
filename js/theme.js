@@ -18,10 +18,6 @@
       usersUl        = $("#users", loginbox),
       users          = [],
       selectedUser,
-      sessionElem    = $("#session"),
-      sessionsUl     = $("#sessions"),
-      sessions       = [],
-      selectedSession,
       countdownElem  = $("#countdown"),
       msgBox         = $("#msg");
   
@@ -34,8 +30,6 @@
   // MDM listeners
   mdm.on("userAdded",       addUser)
      .on("userSelected",    selectUserByName)
-     .on("sessionAdded",    addSession)
-     .on("sessionSelected", selectSession)
      .on("usernamePrompt",  function() { usernameInput.select(); })
      .on("passwordPrompt",  function() { passwordInput.select(); })
      .on("shutdownHidden",  function() { $("#shutdown").hide(); })
@@ -74,7 +68,7 @@
    */
   function login(evt) {
     evt.preventDefault();
-    mdm.login(usernameInput.val(), passwordInput.val(), selectedSession);
+    mdm.login(usernameInput.val(), passwordInput.val());
   }
   
   /**
@@ -84,15 +78,14 @@
    * @param  {user}  user  user object
    */
   function addUser(evt, user) {
-    var li   = $(document.createElement("li")),
-        a    = $(document.createElement("a")),
-        icon = $(document.createElement("i")),
+    var li   = $('<li>'),
+        a    = $('<a>' + user.name + '</a>'),
+        icon = $('<i class="fa fa-user">'),
         img  = new Image();
     
     usersUl.append(
       li.append(
-        a.append(icon.addClass("fa fa-user"))
-         .append(user.name)
+        a.prepend(icon)
       )
     );
     
@@ -118,53 +111,66 @@
     if (users.length === 1) {
       userlistToggle.one("click", toggleUserlist);
     }
-  }
-  
-  /**
-   * Retrieve user object by username
-   * @param  {string} username
-   * @return {user}             user object
-   */
-  function getUser(username) {
-    for (var i=0, l=users.length ; i<l ; ++i)
-      if (users[i].name === username)
-        return users[i];
-    return {name: username};
     
+    if (!selectedUser) {
+      selectedUser = user;
+    }
   }
   
   /**
    * Set a user as selected for login
    * by passing a username
    * 
-   * @param  {event} evt        optional mdm event
+   * @param  {event} evt       mdm event
    * @param  {string} username
    */
   function selectUserByName(evt, username) {
-    selectUser(evt, getUser(username));
+    selectUser(evt, mdm.getUser(username));
   }
   
   /**
    * Set a user as selected for login
    * by passing a user object
    * 
-   * @param  {event} evt   optional mdm or click event
-   * @param  {string} user user object
+   * @param  {event} evt  mdm or click event
+   * @param  {User}  user
    */
   function selectUser(evt, user) {
-    selectedUser = user;
+    selectedUser.li.removeClass("selected");
+    updateFace(user);
+    
+    if (!user) return;
+    
     if (!usernameInput.is(evt.target)) {
       usernameInput.val(user.name);
     }
-    users.forEach(function(usr) {
-      if (usr.name == user.name) {
-        usr.li.addClass("selected");
-      }
-      else {
-        usr.li.removeClass("selected");
-      }
-    });
-    updateFace(user);
+    user.li.addClass("selected");
+    selectedUser = user;
+  }
+  
+  /**
+   * Sets the face image next to the loginbox
+   * if the currently selected user has one.
+   * The relevant file is
+   * /home/{username}/.face
+   * 
+   * @param  {User} user   user object
+   */
+  function updateFace(user) {
+    loginbox.removeClass("hasface");
+    
+    if (!user) return;
+    
+    if (user.img.loaded) {
+      faceElem.attr("src", user.img.src);
+      loginbox.addClass("hasface");
+    } else {
+      $(user.img).one("load", function() {
+        if (user == selectedUser)
+        faceElem.attr("src", user.img.src);
+        loginbox.addClass("hasface");
+      });
+    }
   }
   
   /**
@@ -186,73 +192,6 @@
     }
     usersUl.toggleClass("expanded");
     usersUl.expanded = !usersUl.expanded;
-  }
-  
-  /**
-   * Sets the face image next to the loginbox
-   * if the currently selected user has one.
-   * The relevant file is
-   * /home/{username}/.face
-   * 
-   * @param  {user} user   user object
-   */
-  function updateFace(user) {
-    loginbox.removeClass("hasface");
-    if (mdm.userExists(user.name)) {
-      if (user.img.loaded) {
-        faceElem.attr("src", user.img.src);
-        loginbox.addClass("hasface");
-      } else
-        $(user.img).one("load", function() {
-          if (user == selectedUser)
-          faceElem.attr("src", user.img.src);
-          loginbox.addClass("hasface");
-        });
-    }
-  }
-  
-  /**
-   * Add a selectable session to the list
-   * @param {event}   evt     optional mdm event
-   * @param {session} session session object
-   * @return {publicAPI}   chainable
-   */
-  function addSession(evt, session) {
-    var a = $(document.createElement("a"))
-      .html(session.name);
-    
-    session.li = $(document.createElement("li"))
-      .append(a);
-    
-    sessionsUl.append(session.li);
-    sessions.push(session);
-    
-    a.click(function() {
-      selectSession(null, session);
-    });
-    
-    // show first session by default
-    if (!selectedSession) {
-      selectSession(null, session);
-    }
-  }
-  
-
-  /**
-   * Set a session as selected for login
-   * @param  {event}  evt       optional mdm event
-   * @param  {session} session  session object
-   * @return {publicAPI}        chainable
-   */
-  function selectSession(evt, session) {
-    selectedSession = session;
-    
-    sessionElem.html(session.name);
-    sessions.forEach(function(sess) {
-      if (sess.name === session.name)
-        sess.li.addClass("selected");
-      else sess.li.removeClass("selected");
-    });
   }
   
   /**

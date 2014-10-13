@@ -37,25 +37,29 @@
         <div id="sessionLabel">Session</div>
         <div id="session">{session}</div>
         <ul id="sessions"></ul>
-      
+        
       </nav><span id="countdown"></span>
       
-      <ul id="system">
-        <li id="quit">
+      <ul id="menu">
+        <li id="languageNav">
+          <a id="language">{language}</a>
+          <ul id="languages" class="tooltip">
+          </ul>
+        </li><li id="quit">
           <a>
-            <i class="fa fa-terminal"></i><span>quit</span>
+            <i class="fa fa-terminal"></i><span class="tooltip">Quit</span>
           </a>
         </li><!-- <li id="suspend">
           <a>
-            <i class="fa fa-moon-o"></i><span>suspend</span>
+            <i class="fa fa-moon-o"></i><span class="tooltip">Suspend</span>
           </a>
         </li> --><li id="restart">
           <a>
-            <i class="fa fa-refresh"></i><span>restart</span>
+            <i class="fa fa-refresh"></i><span class="tooltip">Restart</span>
           </a>
         </li><li id="shutdown">
           <a>
-            <i class="fa fa-power-off"></i><span>shutdown</span>
+            <i class="fa fa-power-off"></i><span class="tooltip">Shutdown</span>
           </a>
         </li>
       </ul>
@@ -98,16 +102,25 @@
     <script src="min/MDModern.js"></script>
     <script>
       // test data
-      if (debug) {
-        // mdm_add_user("philer", "Philipp Miller", "");
-        // mdm_add_user("userx", "User X", "Logged in");
-        // mdm_set_current_user("philer");
-        // mdm_add_session("Cinnamon");
-        // mdm_add_session("Mate");
-        // mdm_add_session("i3");
-        // mdm_set_current_session("Cinnamon");
-        // mdm_error("test");
-      }
+      // if (debug) {
+      //   mdm_add_user("philer", "Philipp Miller", "");
+      //   mdm_add_user("userx", "User X", "Logged in");
+      //   mdm_set_current_user("philer");
+        
+      //   mdm_add_session("Cinnamon", "cinnamon_file");
+      //   mdm_add_session("Mate", "mate_file");
+      //   mdm_add_session("i3", "i3_file");
+      //   mdm_set_current_session("Cinnamon", "cinnamon_file");
+        
+      //   mdm_add_language("English", "en");
+      //   mdm_add_language("English (US)", "en_us");
+      //   mdm_add_language("German", "de_at");
+      //   mdm_add_language("French", "fr");
+      //   mdm_set_current_language("English (US)", "en_us");
+      //   // mdm_error("test");
+        
+      //   mdm_timed("Countdown at 50");
+      // }
     </script>
     
   </body>
