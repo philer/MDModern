@@ -113,7 +113,8 @@
       case "json":
         if (JSON) return JSON.parse;
         else break;
-      
+        
+        /* falls through */
       case "plain":
       // case "text":
       // default:
@@ -160,7 +161,7 @@
           
           // property = value
           if (matches = line.match(/^(\S+)\s*=\s*(.*)$/)) {
-            props[matches[1]] = JSON ? JSON.parse(matches[2]) : matches[2];
+            props[matches[1]] = (JSON ? JSON.parse(matches[2]) : matches[2]);
           }
           
           // [property] array definition
