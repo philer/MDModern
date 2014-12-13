@@ -170,7 +170,7 @@
     alert("LANGUAGE###" + language.code);
     trigger("languageSelected", language);
     return mdm;
-  }
+  };
   
   /**
    * Shutdown immediately
@@ -231,7 +231,7 @@
       );
     
     $mdm.triggerHandler(evtName, evtData);
-  };
+  }
   
   
   /// MODELS

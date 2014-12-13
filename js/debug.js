@@ -10,12 +10,10 @@
   
   "use strict";
   
-  var debug = {},
+  var debug = window.debug = {},
       log   = [],
       logFunctions = [window.console.log.bind(console)],
       logElem;
-  
-  window.debug = debug;
   
   /// Functions
   
@@ -32,7 +30,7 @@
       msg = Array.prototype.join.call(arguments, ", ");
     }
     
-    var t  = new Date,
+    var t  = new Date(),
         dt = new Date(t - startTime);
     
     log.push({ message: msg, at: t, sinceStart: dt });

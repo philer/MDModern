@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
   
+  "use strict";
+  
   require('load-grunt-tasks')(grunt);
   
   grunt.initConfig({
@@ -29,6 +31,26 @@ module.exports = function(grunt) {
       '<%= dirs.js %>/lsb_release.js',
     ],
     
+    jshint: {
+      options: {
+        strict: true,    // require all functions (but not global) to be strict mode
+        '-W014': true,   // "Bad line break before '+'."
+        '-W084': true,   // if (a = b)
+        '-W093': true,   // return a = b;
+        "-W086": true,   // allow switch-case fall-through
+        validthis: true, // $(this) -> "Possible strict mode violation"
+        
+        globals: {
+          jQuery: true,
+        },
+      },
+      all: [
+        'Gruntfile.js',
+        '<%= jsFiles %>',
+        '<%= dirs.js %>/debug.js',
+      ],
+    },
+    
     uglify: {
       dist: {
         options: {
@@ -38,6 +60,15 @@ module.exports = function(grunt) {
           '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
         }
       }
+    },
+    
+    removelogging: {
+      production: {
+        src: [
+          // Each file will be overwritten with the assets!
+          '<%= dirs.out %>/*.min.js',
+        ],
+      },
     },
     
     concat: {
@@ -78,5 +109,6 @@ module.exports = function(grunt) {
   });
   
   grunt.registerTask('default', ['less:dev',  'concat:dev']);
-  grunt.registerTask('dist',    ['less:dist', 'uglify:dist']);
+  grunt.registerTask('dist',    ['less:dist', 'jshint', 'uglify:dist', 'removelogging']);
+  grunt.registerTask('all',     ['default', 'dist']);
 };

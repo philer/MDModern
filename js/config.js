@@ -9,10 +9,10 @@
   
   "use strict";
   
-  var config = {},
-      cache  = {};
-  
-  window.config = config;
+  var config = window.config = {
+        require: require,
+      },
+      cache = Object.create(null);
   
   /// Functions
   
@@ -39,7 +39,7 @@
    * @param  {Function} callback called with results
    * @return {config}            chaining
    */
-  config.require = function(filename, parser, callback) {
+  function require(filename, parser, callback) {
     
     if (!callback) {
       // assume default parser
@@ -48,16 +48,16 @@
     }
     
     // cached config file
-    if (cache.hasOwnProperty(filename)) {
+    if (filename in cache) {
       var parsed;
       if (typeof parser === "string") {
         if (!(parsed = cache[filename][parser])) {
           parsed = cache[filename][parser]
-                 = getParserFunction(parser)(cache[filename]["plain"]);
+                 = getParserFunction(parser)(cache[filename].plain);
         }
       } else {
         // custom parse function
-        parsed = parser(cache[filename]["plain"]);
+        parsed = parser(cache[filename].plain);
       }
       if (callback) callback(parsed);
       return config;
@@ -166,8 +166,9 @@
           // [property] array definition
           else if (matches = line.match(/^\[(\S+)\]$/)) {
             currentProp = matches[1];
-            if (!props.hasOwnProperty(currentProp))
+            if (!props.hasOwnProperty(currentProp)) {
               props[currentProp] = [];
+            }
           }
           
           // [property] array entry
