@@ -62,6 +62,24 @@ button, input {
   }
 }
 
+::-webkit-scrollbar,
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+    width: 2px;
+    background-color: transparent;
+    border: 0 transparent;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+}
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,.3);
+}
+
+
 html, body {
   height: 100%;
   width: 100%;
@@ -200,6 +218,11 @@ html, body {
         border: 10px solid transparent;
         border-bottom-color: @panelBgColor;
       }
+      > * {
+        max-height: 90vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
     }
     li:hover .tooltip {
       visibility: visible;
@@ -249,12 +272,15 @@ html, body {
   z-index: 0;
   position: relative;
   top: -20rem;
-  // max-height: 0;
-  opacity: 0;
-  transition-duration: .5s;
-  transition-property: top, opacity, border, box-shadow;
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   
-  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition-duration: .5s;
+  transition-property: top, opacity, visibility, border, box-shadow;
+  
   background-color: @panelBgColor;
   
   li {
@@ -269,9 +295,9 @@ html, body {
   }
 }
 #sessionNav:hover #sessions {
-  // max-height: 30em;
   top: 0;
   opacity: 1;
+  visibility: visible;
   border-bottom: 1rem solid @panelBgColor;
   box-shadow: @panelShadow;
 }
