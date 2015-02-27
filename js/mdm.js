@@ -41,11 +41,17 @@
   
   // export mdm object into global namespace
   var mdm = win.mdm = {},
-     $mdm          = $(mdm),
+     $mdm = $(mdm),
+      
+      // true if mdm_add_user has been called at least once
       userSelected = false,
-      users        = [],
-      sessions     = [],
-      languages    = [];
+      
+      // true if mdm_noecho has been called more recently then mdm_prompt
+      passwordExpected = false,
+      
+      users     = [],
+      sessions  = [],
+      languages = [];
   
   /// api functions
   
@@ -53,16 +59,23 @@
    * jQuery style event listener binding
    * @see https://api.jquery.com/on/
    */
-  mdm.on  = $mdm.on.bind($mdm);
+  mdm.on  = $.fn.on.bind($mdm);
   
   /**
    * jQuery style event listener binding
    * @see https://api.jquery.com/one/
    */
-  mdm.one = $mdm.one.bind($mdm);
+  mdm.one = $.fn.one.bind($mdm);
   
   // listener used by the mdm module
-  mdm.one("userSelected", function(evt, username) {
+  mdm
+    .on("passwordPrompt", function() {
+      passwordExpected = true;
+    })
+    .on("usernamePrompt", function() {
+      passwordExpected = false;
+    })
+    .one("userSelected", function(evt, username) {
       userSelected = true;
     });
   
@@ -108,16 +121,11 @@
   mdm.selectUser = function(user) {
     if (typeof user !== "string") user = user.name;
     
-    // additonal safeguard: only send passwords for known users
-    // (MDM's replies are kinda unpredictable otherwise)
-    if (mdm.getUser(user)) {
-      if (debug) debug.log("MDM: sending username");
-      alert("USER###" + user);
-      userSelected = true;
-    }
-    else {
-      trigger("error", 'User "' + user + '" doesn\'t exist!');
-    }
+    passwordExpected = false;
+    
+    if (debug) debug.log("MDM: sending username");
+    alert("USER###" + user);
+    
     return mdm;
   };
   
@@ -130,17 +138,34 @@
    * @return {mdm}              chainable
    */
   mdm.sendPassword = function(password) {
-    if (!userSelected) {
-      trigger("error", "No user selected!");
-    }
-    else {
+    
+    // we need to make sure the password is only sent when MDM expects it,
+    // otherwise the LOGIN###... alert will be interpreted as a username.
+    
+    if (!userSelected) return;
+    
+    if (passwordExpected) {
+      _sendPassword(password);
+    } else {
       mdm.one("passwordPrompt", function() {
-        if (debug) debug.log("MDM: sending password");
-        alert("LOGIN###" + password);
+        _sendPassword(password);
       });
     }
+    
     return mdm;
   };
+  
+  /**
+   * Private; send the password now
+   * Throws error if MDM isn't expecting a password
+   * @see  mdm.sendPassword
+   * @param  {string} password
+   */
+  function _sendPassword(password) {
+    if (debug) debug.log("MDM: sending password");
+    alert("LOGIN###" + password);
+    passwordExpected = false;
+  }
   
   /**
    * Find an existing Session by its filen ame
@@ -464,7 +489,7 @@
   };
   
   win.mdm_set_current_user = function(username) {
-    trigger("userSelected", mdm.getUser(username));
+    trigger("userSelected", mdm.getUser(username) || new User(username));
   };
   win.mdm_set_current_session = function(session_name, session_file) {
     trigger("sessionSelected", mdm.getSession(session_file));

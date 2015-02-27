@@ -31,7 +31,7 @@
   
   // MDM listeners
   mdm.on("userAdded",       addUser)
-     .on("userSelected",    selectUserByName)
+     .on("userSelected",    selectUser)
      .on("usernamePrompt",  function() { usernameInput.select(); })
      .on("passwordPrompt",  function() { passwordInput.select(); })
      .on("shutdownHidden",  function() { $("#shutdown").hide(); })
@@ -47,7 +47,7 @@
   
   // select user by typing in the input field
   usernameInput.on("propertychange input paste", function(evt) {
-    selectUserByName(evt, $(this).val());
+    selectUser(evt, mdm.getUser(this.value));
   });
   
   $("form", loginbox).submit(login);
@@ -70,7 +70,7 @@
    */
   function login(evt) {
     evt.preventDefault();
-    mdm.login(usernameInput.val(), passwordInput.val());
+    mdm.login(usernameInput[0].value, passwordInput[0].value);
   }
   
   /**
@@ -121,17 +121,6 @@
   
   /**
    * Set a user as selected for login
-   * by passing a username
-   * 
-   * @param  {event} evt       mdm event
-   * @param  {string} username
-   */
-  function selectUserByName(evt, username) {
-    selectUser(evt, mdm.getUser(username));
-  }
-  
-  /**
-   * Set a user as selected for login
    * by passing a user object
    * 
    * @param  {event} evt  mdm or click event
@@ -143,10 +132,16 @@
     
     if (!user) return;
     
-    if (!usernameInput.is(evt.target)) {
+    if (!usernameInput.is(evt.target)
+      && user.name !== usernameInput[0].value
+    ) {
       usernameInput.val(user.name);
     }
-    user.li.addClass("selected");
+    
+    if (user.li) {
+      user.li.addClass("selected");
+    }
+    
     selectedUser = user;
   }
   
