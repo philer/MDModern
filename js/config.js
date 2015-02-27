@@ -1,6 +1,8 @@
 /**
  * Retrive configuration as array of lines from a file
  * 
+ * globals: jQuery config (debug)
+ * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 

@@ -1,6 +1,8 @@
 /**
  * Session selection module
  * 
+ * globals: jQuery mdm
+ * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 

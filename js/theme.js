@@ -1,6 +1,8 @@
 /**
  * Backend for a HTML5 MDM theme.
  * 
+ * globals: jQuery mdm (debug)
+ * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 

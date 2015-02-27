@@ -4,11 +4,13 @@
  * See settings below
  * 
  * Public api:
- * next    skip ahead to next image
- * prev    previous image
- * start   restart interval
- * stop    halt interval
- * shuffle re-shuffle images
+ *   next    skip ahead to next image
+ *   prev    previous image
+ *   start   restart interval
+ *   stop    halt interval
+ *   shuffle re-shuffle images
+ * 
+ * globals: jQuery slideshow config (debug)
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -19,9 +21,9 @@
   
   "use strict";
   
-  var slideshow = {};
-  
-  var defaultSettings = {
+  var slideshow = window.slideshow = {},
+      
+      defaultSettings = {
         interval_seconds: 10,
         fade_seconds:     2,
         shuffle:          true,
@@ -29,15 +31,13 @@
         show_filename:    true,
       },
       settings,
+      
       elems      = [ $("#bg0"), $("#bg1") ],
       topElem    = 0,
       loader     = new Image(),
       sources,
       currentId,
       intervalId;
-  
-  // export interface
-  window.slideshow = slideshow;
   
   // pass sources from config file to init
   $(loader).on("load", showCurrent);
@@ -180,7 +180,14 @@
    * @return {slideshow} chaining
    */
   slideshow.shuffle = function() {
-    sources = _.shuffle(sources);
+    // sources = _.shuffle(sources);
+    var tmp, j;
+    for (var i = sources.length ; i-- ; ) {
+      j = Math.floor(Math.random() * i);
+      tmp = sources[i];
+      sources[i] = sources[j];
+      sources[j] = tmp;
+    }
     return slideshow;
   };
   

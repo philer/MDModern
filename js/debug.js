@@ -2,6 +2,8 @@
  * Debug object provides custom logging interface
  * Defaults to console.log but can be changed (major use case)
  * 
+ * globals: jQuery debug
+ * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
@@ -104,6 +106,14 @@
   debug.formatString = function formatString(x, depth) {
     depth = +depth;
     
+    switch (x) {
+      case undefined:
+        return "undefined";
+        
+      case null:
+        return "null";
+    }
+    
     if (Array.isArray(x)) {
       return "["
         + x.map(
@@ -117,22 +127,19 @@
     switch (typeof x) {
       case "function":
         return "function";
-      
-      case "undefined":
-        return "undefined";
-      
+        
       case "object":
         return "{"
-        + Object.getOwnPropertyNames(x)
-            .map(
-              function(prop) {
-                return prop + ": " + (depth ? formatString(x[prop], depth-1) : x[prop]);
-              }) 
-            .join(", ")
-        + "}";
+          + Object.getOwnPropertyNames(x)
+              .map(
+                function(prop) {
+                  return prop + ": " + (depth ? formatString(x[prop], depth-1) : x[prop]);
+                }) 
+              .join(", ")
+          + "}";
       
       default:
-        return x;
+        return "" + x;
     }
   };
   

@@ -10,6 +10,8 @@
  * DISTRIB_CODENAME    => .lsb_distrib_codename
  * DISTRIB_DESCRIPTION => .lsb_distrib_description
  * 
+ * globals: config (debug)
+ * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
