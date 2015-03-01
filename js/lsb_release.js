@@ -10,7 +10,7 @@
  * DISTRIB_CODENAME    => .lsb_distrib_codename
  * DISTRIB_DESCRIPTION => .lsb_distrib_description
  * 
- * globals: config (debug)
+ * globals: config (HtmlConsole)
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -43,7 +43,7 @@
   /// Functions
   
   function init(cfg) {
-    if (debug) debug.log(debug.formatString(cfg));
+    HtmlConsole.log(cfg);
     
     lsbObjects.map(function(lsbObj) {
       if (cfg.hasOwnProperty(lsbObj.key)) {

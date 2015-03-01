@@ -1,7 +1,7 @@
 /**
  * Retrive configuration as array of lines from a file
  * 
- * globals: jQuery config (debug)
+ * globals: jQuery config (HtmlConsole)
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -75,7 +75,7 @@
       mimeType: "text/plain",
       
     }).done(function(content) {
-      if (debug) debug.log("LOADED: " + filename);
+      HtmlConsole.log("LOADED: " + filename);
       
       cache[filename] = { "plain" : content };
       

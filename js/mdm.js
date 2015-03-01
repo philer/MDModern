@@ -123,7 +123,7 @@
     
     passwordExpected = false;
     
-    if (debug) debug.log("MDM: sending username");
+    HtmlConsole.log("MDM: sending username");
     alert("USER###" + user);
     
     return mdm;
@@ -162,7 +162,7 @@
    * @param  {string} password
    */
   function _sendPassword(password) {
-    if (debug) debug.log("MDM: sending password");
+    HtmlConsole.log("MDM: sending password");
     alert("LOGIN###" + password);
     passwordExpected = false;
   }
@@ -188,7 +188,7 @@
    * @return {mdm}             chainable
    */
   mdm.selectSession = function(session) {
-    if (debug) debug.log("MDM: sending session info");
+    HtmlConsole.log("MDM: sending session info");
     alert("SESSION###" + session.name + "###" + session.file);
     trigger("sessionSelected", session);
     return mdm;
@@ -215,7 +215,7 @@
    * @return {mdm}               chainable
    */
   mdm.selectLanguage = function(language) {
-    if (debug) debug.log("MDM: sending language info");
+    HtmlConsole.log("MDM: sending language info");
     alert("LANGUAGE###" + language.code);
     trigger("languageSelected", language);
     return mdm;
@@ -227,7 +227,7 @@
    * @return {mdm}    chainable
    */
   mdm.shutdown = function() {
-    if (debug) debug.log("MDM: sending force-shutdown request");
+    HtmlConsole.log("MDM: sending force-shutdown request");
     alert("FORCE-SHUTDOWN###");
     return mdm;
   };
@@ -238,7 +238,7 @@
    * @return {mdm}    chainable
    */
   mdm.restart = function() {
-    if (debug) debug.log("MDM: sending force-restart request");
+    HtmlConsole.log("MDM: sending force-restart request");
     alert("FORCE-RESTART###");
     return mdm;
   };
@@ -249,7 +249,7 @@
    * @return {mdm}    chainable
    */
   mdm.suspend = function() {
-    if (debug) debug.log("MDM: sending force-suspend request");
+    HtmlConsole.log("MDM: sending force-suspend request");
     alert("FORCE-SUSPEND###");
     return mdm;
   };
@@ -260,7 +260,7 @@
    * @return {mdm}    chainable
    */
   mdm.quit = function() {
-    if (debug) debug.log("MDM: sending quit request");
+    HtmlConsole.log("MDM: sending quit request");
     alert("QUIT###");
     return mdm;
   };
@@ -273,10 +273,10 @@
    * @param  {mixed } evtData optional
    */
   function trigger(evtName, evtData) {
-    if (debug) debug.log(
+    HtmlConsole.log(
         "EVENT: "
         + evtName
-        + (evtData ? "\t" + debug.formatString(evtData) : "")
+        + (evtData ? "\t" + HtmlConsole.formatString(evtData) : "")
       );
     
     $mdm.triggerHandler(evtName, evtData);

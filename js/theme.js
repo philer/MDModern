@@ -1,7 +1,7 @@
 /**
  * Backend for a HTML5 MDM theme.
  * 
- * globals: jQuery mdm (debug)
+ * globals: jQuery mdm
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -22,12 +22,6 @@
       selectedUser,
       countdownElem  = $("#countdown"),
       msgBox         = $("#msg");
-  
-  // custom debug logging
-  if (debug) {
-    debug.logElem($("#log"), true)
-         .log('Theme init on "' + navigator.userAgent + '"');
-  }
   
   // MDM listeners
   mdm.on("userAdded",       addUser)

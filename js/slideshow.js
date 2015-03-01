@@ -10,7 +10,7 @@
  *   stop    halt interval
  *   shuffle re-shuffle images
  * 
- * globals: jQuery slideshow config (debug)
+ * globals: jQuery slideshow config (HtmlConsole)
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -50,7 +50,7 @@
     settings = $.extend(defaultSettings, cfg);
     sources  = settings.backgrounds;
     
-    if (debug) debug.log("Starting slideshow with " + sources.length + " images");
+    HtmlConsole.log("Starting slideshow with " + sources.length + " images");
     
     // 1 image shortcut
     if (sources.length == 1) {
@@ -126,8 +126,7 @@
     if (settings.show_filename)
       elems[topElem].filenameElem.text(sources[currentId]);
     
-    if (debug)
-      debug.log(sources[currentId]);
+    // HtmlConsole.log(sources[currentId]);
   }
   
   /**

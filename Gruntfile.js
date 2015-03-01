@@ -47,40 +47,48 @@ module.exports = function(grunt) {
       all: [
         'Gruntfile.js',
         '<%= jsFiles %>',
-        '<%= dirs.js %>/debug.js',
         'console/*.js',
       ],
-    },
-    
-    uglify: {
-      dist: {
-        options: {
-          banner: '<%= default_banner %>var debug=false;'
-        },
-        files: {
-          '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
-        }
-      }
-    },
-    
-    removelogging: {
-      production: {
-        src: [
-          // Each file will be overwritten with the assets!
-          '<%= dirs.out %>/*.min.js',
-        ],
-      },
     },
     
     concat: {
       dev: {
         src: [
-          '<%= dirs.js %>/debug.js',
           '<%= jsFiles %>',
           'console/console.js',
           'console/mdm-console.js',
         ],
         dest: '<%= dirs.out %>/<%= pkg.name %>.js'
+      },
+      dist: {
+        src: '<%= jsFiles %>',
+        dest: '<%= dirs.out %>/<%= pkg.name %>.js'
+      }
+    },
+    
+    removelogging: {
+      dist: {
+        options: {
+          namespace: [
+            'console', 'HtmlConsole', 'cnsl',
+          ],
+          methods: [
+            'log', 'warn', 'error', 'info', 'exec', 'formatString',
+          ],
+        },
+        src: [
+          // Each file will be overwritten with the assets!
+          '<%= dirs.out %>/*.js',
+        ],
+      },
+    },
+    
+    uglify: {
+      dist: {
+        files: {
+          // '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
+          '<%= dirs.out %>/<%= pkg.name %>.js': '<%= dirs.out %>/<%= pkg.name %>.js' // replace
+        }
       }
     },
     
@@ -114,14 +122,20 @@ module.exports = function(grunt) {
         tasks: ['less:dev']
       },
       scripts: {
-        files: '<%= dirs.js %>/**/*.js',
+        files: ['<%= dirs.js %>/**/*.js', 'console/*.js'],
         tasks: ['concat:dev']
       }
     }
     
   });
   
-  grunt.registerTask('dev',  ['less:dev',  'concat:dev']);
-  grunt.registerTask('dist', ['less:dist', 'jshint', 'uglify:dist', 'removelogging']);
+  grunt.registerTask('dev',  ['less:dev', 'concat:dev']);
+  grunt.registerTask('dist', [
+    'less:dist',
+    'jshint',
+    'concat:dist',
+    'removelogging',
+    'uglify:dist',
+  ]);
   grunt.registerTask('default', 'dev');
 };
