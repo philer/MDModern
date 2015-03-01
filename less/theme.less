@@ -9,8 +9,11 @@
 @panelBorder: 1px solid #292929;
 @panelShadow: 1px 1px 5px rgba(0,0,0,.5);
 
-@loginBoxHeight: 10rem;
-@loginBoxWidth: 26rem;
+@loginBoxLeft:   50%;
+@loginBoxTop:    50%;
+@loginBoxHeight: 10rem; // excluding border
+@loginBoxWidth:  26rem; // excluding border
+@loginBoxBorderWidth: 1rem;
 @loginInputHeight: 2.5rem;
 
 
@@ -165,13 +168,13 @@ html, body {
   
   h1 {
     position: absolute;
-    left: .5*@panelHeight;
+    left: (.5*@panelHeight);
     font-size: 1.2rem;
   }
   
   #menu {
     position: absolute;
-    right: .5*@panelHeight;
+    right: (.5*@panelHeight);
     
     // border-left: 1px solid black;
     > li {
@@ -244,7 +247,7 @@ html, body {
 #sessionNav {
   z-index: 700;
   position: relative;
-  min-width: 3*@panelHeight;
+  min-width: (3*@panelHeight);
 }
 #sessionLabel, #session {
   z-index: 1;
@@ -258,10 +261,10 @@ html, body {
   border-width: 0 1px;
 }
 #sessionLabel {
-  padding-top: .5*@panelHeight - @defaultLineHeight;
+  padding-top: (.5*@panelHeight - @defaultLineHeight);
 }
 #session {
-  padding: 0 1rem .5*@panelHeight - @defaultLineHeight;
+  padding: 0 1rem (.5*@panelHeight - @defaultLineHeight);
 }
 #sessions, #session {
   font-size: 1.2em;
@@ -333,6 +336,9 @@ html, body {
 
 /*** LOGIN BOX ***/
 
+@loginBoxOuterHeight: (@loginBoxHeight + 2*@loginBoxBorderWidth);
+@loginBoxOuterWidth:  (@loginBoxWidth  + 2*@loginBoxBorderWidth);
+
 #loginbox,
 #loginbox form {
   height: @loginBoxHeight;
@@ -340,26 +346,21 @@ html, body {
 }
 #loginbox {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  
-  // pull back half the box size plus border width
-  margin: -(1rem + @loginBoxHeight/2) 0 0 -(1rem + @loginBoxWidth/2);
-  
   box-sizing: content-box;
+  
+  top: calc(@loginBoxTop - (.5*@loginBoxOuterHeight));
+  left: calc(@loginBoxLeft - (.5*@loginBoxOuterWidth));
+  
   border: 1rem solid rgba(20, 20, 20, .66);
+  
   box-shadow: /*0 0 5px rgba(0,0,0,.66),
               0 0 0 5px rgba(25,25,25,.66),/**/
               1px 1px 7px rgba(0,0,0,.5),
               0 0 3em rgba(0,0,0,.33);
   
   &.hasface {
-    width: @loginBoxWidth + @loginBoxHeight;
-    margin-left: -.5*(@loginBoxWidth + @loginBoxHeight);
-    // form {
-    //   border-top-left-radius: 0;
-    //   border-bottom-left-radius: 0;
-    // }
+    width: (@loginBoxWidth + @loginBoxHeight);
+    left: calc(@loginBoxLeft - (.5*(@loginBoxOuterWidth + @loginBoxHeight)) );
   }
 
   &, #face, form {
@@ -384,7 +385,7 @@ html, body {
     fieldset {
       position: relative;
       display: block;
-      width: @loginBoxWidth - 2*2rem;
+      width: (@loginBoxWidth - 2*2rem);
       height: @loginInputHeight;
       margin: -1px 0 1rem -1px;
       box-sizing: content-box;
@@ -419,7 +420,7 @@ html, body {
       line-height: @loginInputHeight;
     }
     input {
-      width: @loginBoxWidth - 2*2rem - 2*@loginInputHeight;
+      width: (@loginBoxWidth - 2*2rem - 2*@loginInputHeight);
       padding: 0 .66rem;
       box-shadow: inset 1px 1px 4px rgba(0, 0, 0, .33);
     }
@@ -432,7 +433,7 @@ html, body {
       z-index: 1;
       top: @loginInputHeight;
       box-sizing: content-box;
-      width: @loginBoxWidth - 2*2rem;
+      width: (@loginBoxWidth - 2*2rem);
       padding: .25rem 1px;
       margin: 1px -1px;
       
@@ -524,4 +525,13 @@ html, body {
   text-align: left;
   overflow: auto;
   white-space: pre-wrap;
+}
+
+#console {
+  width: calc((min(50%,@loginBoxLeft)) - ((.5*(@loginBoxOuterWidth + @loginBoxHeight) + 2rem)));
+  height: auto;
+  top: (@panelHeight + 1rem);
+  right: 1rem;
+  bottom: 4rem;
+  background-color: rgba(20,20,20,.8);
 }

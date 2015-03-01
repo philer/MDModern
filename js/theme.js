@@ -130,7 +130,7 @@
     selectedUser.li.removeClass("selected");
     updateFace(user);
     
-    if (!user) return;
+    if (!(user && user.li)) return;
     
     if (!usernameInput.is(evt.target)
       && user.name !== usernameInput[0].value
@@ -156,7 +156,7 @@
   function updateFace(user) {
     loginbox.removeClass("hasface");
     
-    if (!user) return;
+    if (!(user && user.img)) return;
     
     if (user.img.loaded) {
       faceElem.attr("src", user.img.src);

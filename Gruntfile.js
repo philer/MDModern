@@ -48,6 +48,7 @@ module.exports = function(grunt) {
         'Gruntfile.js',
         '<%= jsFiles %>',
         '<%= dirs.js %>/debug.js',
+        'console/*.js',
       ],
     },
     
@@ -73,7 +74,12 @@ module.exports = function(grunt) {
     
     concat: {
       dev: {
-        src: ['<%= dirs.js %>/debug.js', '<%= jsFiles %>'],
+        src: [
+          '<%= dirs.js %>/debug.js',
+          '<%= jsFiles %>',
+          'console/console.js',
+          'console/mdm-console.js',
+        ],
         dest: '<%= dirs.out %>/<%= pkg.name %>.js'
       }
     },
@@ -82,15 +88,22 @@ module.exports = function(grunt) {
       dist: {
         options: {
           compress: true,
-          banner: '<%= default_banner %>'
+          banner: '<%= default_banner %>',
+          strictMath: true,
         },
         files: {
-          '<%= dirs.out %>/<%= pkg.name %>.css': '<%= dirs.less %>/theme.less'
-        }
+          '<%= dirs.out %>/<%= pkg.name %>.css': '<%= dirs.less %>/theme.less',
+        },
       },
       dev: {
+        options: {
+          strictMath: true,
+        },
         files: {
-          '<%= dirs.out %>/<%= pkg.name %>.css': '<%= dirs.less %>/theme.less'
+          '<%= dirs.out %>/<%= pkg.name %>.css': [
+            'console/console.css',
+            '<%= dirs.less %>/theme.less',
+          ],
         }
       }
     },
@@ -108,7 +121,7 @@ module.exports = function(grunt) {
     
   });
   
-  grunt.registerTask('default', ['less:dev',  'concat:dev']);
-  grunt.registerTask('dist',    ['less:dist', 'jshint', 'uglify:dist', 'removelogging']);
-  grunt.registerTask('all',     ['default', 'dist']);
+  grunt.registerTask('dev',  ['less:dev',  'concat:dev']);
+  grunt.registerTask('dist', ['less:dist', 'jshint', 'uglify:dist', 'removelogging']);
+  grunt.registerTask('default', 'dev');
 };
