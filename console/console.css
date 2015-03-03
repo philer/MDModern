@@ -1,4 +1,14 @@
 @charset "UTF-8";
+/**
+ * Basic JavaScript Console built on html.
+ * 
+ * Put this file in first, then add your css later to overwrite
+ * #console sizing
+ * 
+ * @author  Philipp Miller
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+ * 
+ */
 
 #console {
   z-index: 999999;

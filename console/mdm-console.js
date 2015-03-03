@@ -1,9 +1,10 @@
 /**
- * Does nothing but define MDM's expected global functions
+ * (Re-)defines MDM's expected global functions
  * so they will add a log entry.
  * If the functions already exist they will be wrapped and still function as before.
  * 
  * globals:
+ *   HtmlConsole
  *   mdm_enable
  *   mdm_disable
  *   mdm_prompt
@@ -24,6 +25,9 @@
  *   mdm_hide_suspend
  *   mdm_hide_quit
  *   mdm_hide_xdmcp
+ * 
+ * @author  Philipp Miller
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  */
 (function(win, cnsl) {
   

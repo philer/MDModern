@@ -85,6 +85,9 @@ module.exports = function(grunt) {
     
     uglify: {
       dist: {
+        options: {
+          banner: '<%= defaultBanner %>',
+        },
         files: {
           // '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
           '<%= dirs.out %>/<%= pkg.name %>.js': '<%= dirs.out %>/<%= pkg.name %>.js' // replace
