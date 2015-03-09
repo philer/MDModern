@@ -1,20 +1,21 @@
 /**
  * Retrive configuration as array of lines from a file
  * 
- * globals: jQuery config (HtmlConsole)
+ * globals: config (localStorage|sessionStorage)
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function($) {
+(function(win, storage) {
   
   "use strict";
   
-  var config = window.config = {
+  var config = win.config = {
         require: require,
-      },
-      cache = Object.create(null);
+      }
+    , configFiles = Object.create(null)
+    ;
   
   /// Functions
   
@@ -42,57 +43,88 @@
    * @return {config}            chaining
    */
   function require(filename, parser, callback) {
-    
-    if (!callback) {
-      // assume default parser
-      callback = parser;
-      parser = "properties";
+    if (filename in configFiles) {
+      if (callback || (callback = parser)) {
+        configFiles[filename].addCallback(callback);
+      }
     }
-    
-    // cached config file
-    if (filename in cache) {
-      var parsed;
-      if (typeof parser === "string") {
-        if (!(parsed = cache[filename][parser])) {
-          parsed = cache[filename][parser]
-                 = getParserFunction(parser)(cache[filename].plain);
-        }
-      } else {
-        // custom parse function
-        parsed = parser(cache[filename].plain);
-      }
-      if (callback) callback(parsed);
-      return config;
+    else {
+      configFiles[filename] = new ConfigFile(filename, parser, callback);
     }
-    
-    // new config file
-    $.ajax({
-      url:      filename,
-      type:     "GET",
-      dataType: "text",
-      
-      // firefox logs an error otherwise, no clue what's happening
-      mimeType: "text/plain",
-      
-    }).done(function(content) {
-      HtmlConsole.log("LOADED: " + filename);
-      
-      cache[filename] = { "plain" : content };
-      
-      if (callback && parser === "plain") {
-        callback(content);
-      }
-      else {
-        var parsed = getParserFunction(parser)(content);
-        if (typeof parser === "string")
-          cache[filename][parser] = parsed;
-        
-        if (callback) callback(parsed);
-      }
-      
-    });
     return config;
   }
+  
+  /// Model
+  
+  function ConfigFile(filename, parser, callback) {
+    
+    if (storage && storage.hasOwnProperty(filename)) {
+      this.parsed = JSON.parse(storage.getItem(filename));
+      this.loaded = true;
+    
+      if (callback || (callback = parser)) {
+        callback(this.parsed);
+      }
+      console.log("found '" + filename + "' in storage");
+    }
+    
+    else {
+      this.loaded = false;
+      this.filename = filename;
+      this.callbacks = [];
+      
+      if (callback) {
+        this.parser = getParserFunction(parser);
+        this.callbacks.push(callback);
+      }
+      else {
+        // assume default parser
+        this.parser = parseProperties;
+        
+        // callback => parser
+        if (parser) {
+          this.callbacks.push(parser);
+        }
+      }
+      this._load();
+    }
+    
+  }
+  ConfigFile.prototype = {
+    
+    addCallback: function(fn) {
+      if (this.loaded) {
+        fn(this.parsed);
+      } else {
+        this.callbacks.push(fn);
+      }
+      return this;
+    },
+    
+    _load: function() {
+      console.log("loading file '" + this.filename + "'");
+      
+      this.request = new XMLHttpRequest();
+      this.request.open("GET", this.filename);
+      this.request.addEventListener("load", this._loaded.bind(this));
+      this.request.responseType = "text";
+      this.request.send();
+    },
+    
+    _loaded: function() {
+      this.loaded = true;
+      this.parsed = this.parser(this.request.responseText);
+      if (storage) {
+        storage.setItem(this.filename, JSON.stringify(this.parsed));
+      }
+      for (var i = 0, len = this.callbacks.length ; i < len ; ++i) {
+        this.callbacks[i](this.parsed);
+      }
+      delete this.callbacks;
+      delete this.request;
+    },
+    
+  };
   
   /**
    * Returns a Function that will be used as parser.
@@ -133,9 +165,7 @@
    * @return {array}           array of strings
    */
   function getLines(text) {
-    return _(
-        text.split("\n").map(trimComments)
-      ).without("");
+    return text.split("\n").map(trimComments).filter(identity);
   }
   
   /**
@@ -197,4 +227,13 @@
     return (0 <= i ? string.slice(0, i) : string).trim();
   }
   
-})(jQuery);
+  /**
+   * returns first argument unchanged, does nothing
+   * @param  {mixed} x
+   * @return {mixed} x
+   */
+  function identity(x) {
+    return x;
+  }
+  
+})(window, false /*window.localStorage*/ /*window.sessionStorage*/);

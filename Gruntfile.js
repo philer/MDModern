@@ -34,6 +34,7 @@ module.exports = function(grunt) {
     jshint: {
       options: {
         strict: true,    // require all functions (but not global) to be strict mode
+        laxcomma: true,  // comma-first object definitions
         '-W014': true,   // "Bad line break before '+'."
         '-W084': true,   // if (a = b)
         '-W093': true,   // return a = b;
@@ -86,7 +87,7 @@ module.exports = function(grunt) {
     uglify: {
       dist: {
         options: {
-          banner: '<%= defaultBanner %>',
+          banner: '<%= default_banner %>',
         },
         files: {
           // '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
