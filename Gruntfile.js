@@ -88,6 +88,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           banner: '<%= default_banner %>',
+          screwIE8: true,
         },
         files: {
           // '<%= dirs.out %>/<%= pkg.name %>.js': '<%= jsFiles %>'
