@@ -116,11 +116,11 @@
     },
     
     _loaded: function() {
-      this.loaded = true;
       this.parsed = this.parser(this.request.responseText);
       if (storage) {
         storage.setItem(this.filename, JSON.stringify(this.parsed));
       }
+      this.loaded = true;
       for (var i = 0, len = this.callbacks.length ; i < len ; ++i) {
         this.callbacks[i](this.parsed);
       }
@@ -129,6 +129,12 @@
     },
     
   };
+  
+  // regular expressions for parsers
+  var reValue   = /^(\S+)\s*=\s*(.*)$/
+    , reArray   = /^\[(\S+)\]$/
+    , reComment = /^[^#"]*(:?"[^"]*"[^#"]*)*/
+    ;
   
   /**
    * Returns a Function that will be used as parser.
@@ -196,12 +202,12 @@
           if (line === "") return;
           
           // property = value
-          if (matches = line.match(/^(\S+)\s*=\s*(.*)$/)) {
+          if (matches = reValue.exec(line)) {
             props[matches[1]] = (JSON ? JSON.parse(matches[2]) : matches[2]);
           }
           
           // [property] array definition
-          else if (matches = line.match(/^\[(\S+)\]$/)) {
+          else if (matches = reArray.exec(line)) {
             currentProp = matches[1];
             if (!props.hasOwnProperty(currentProp)) {
               props[currentProp] = [];
@@ -213,7 +219,8 @@
             props[currentProp].push(line);
           }
           
-          else throw new Error("Config: Syntax error on line " + (lineNum + 1));
+          else throw new Error("Config: Syntax error on line " + (lineNum + 1)
+            + " '" + line + "'");
     });
     
     return props;
@@ -227,8 +234,9 @@
    * @return {string}
    */
   function trimComments(string) {
-    var i = string.indexOf("#");
-    return (0 <= i ? string.slice(0, i) : string).trim();
+    // var i = string.indexOf("#");
+    // return (0 <= i ? string.slice(0, i) : string).trim();
+    return reComment.exec(string)[0];
   }
   
   /**
@@ -240,4 +248,4 @@
     return x;
   }
   
-})(window, false /*window.localStorage*/ /*window.sessionStorage*/);
+})(window, localStorage);

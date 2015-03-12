@@ -1,33 +1,61 @@
-
-/*** SLIDESHOW ***/
-
-#bg0, #bg1 {
+.slideshow-layer {
+  z-index: 0;
   position: absolute;
-  top: @panelHeight;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-position: center center;
+  width: 100%;
+  height: 100%;
   background-size: cover;
-  .filename {
-    position: absolute;
-    left: .5em;
-    bottom: .5em;
-    opacity: .5;
-    &:hover { opacity: 1; }
-  }
+  background-position: center center;
+  
+  /**
+   * This is done inline by slideshow.js:
+   * 
+   * <&.top> {
+   *   background: ...;
+   *   transition: z-index 0s 1s;
+   *   z-index: 1;
+   *   opacity: 1;
+   *   visibility: hidden;
+   * }
+   * <&.bottom>
+   *   transition: opacity 1s 0s, z-index 0s 1s, visibility 0s 1s;
+   *   z-index: 0;
+   *   opacity: 0;
+   *   visibility: hidden;
+   * }
+   **/
+  
+  // Performance (hardware acceleration)
+  -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  will-change: background, opacity, z-index, visibility, transition;
 }
 
+.slideshow-filename {
+  position: absolute;
+  left: .5em;
+  bottom: .5em;
+  opacity: .5;
+  &:hover { opacity: 1; }
+}
 
-#slideshowControls {
+.slideshow-controls {
+  z-index: 1;
   position: absolute;
   height: 2em;
   line-height: 2em;
   right: 1em;
   bottom: 1em;
-  a {
+  
+  // buttons
+  > a {
     padding: 0 .5em;
     opacity: .5;
     &:hover { opacity: 1; }
+  }
+  
+  // play|pause toggle button
+  &.slideshow-running > .slideshow-toggle > .fa:before {
+    content: "\f04c"; // @fa-var-pause
   }
 }
