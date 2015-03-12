@@ -1,0 +1,182 @@
+
+/*** LOGIN BOX ***/
+
+@loginInputHeight: 2.5rem;
+@loginInputWidth:  18rem;
+
+@loginBorderWidth: 1rem;
+@loginPadding:     2rem;
+
+@loginInnerHeight: (
+    2*@loginInputHeight
+  + 1rem
+  + 2*@loginPadding
+  );
+
+@loginHeight: (
+    @loginInnerHeight
+  + 2*@loginBorderWidth
+  );
+
+@loginWidth: (
+    @loginInputWidth
+  + 2*@loginInputHeight
+  + 2*@loginPadding
+  + 2*@loginBorderWidth
+  );
+
+@loginWithFaceWidth: (@loginWidth + @loginInnerHeight);
+
+@loginTop:          calc(50% - (.5*@loginHeight) );
+@loginLeft:         calc(50% - (.5*@loginWidth) );
+@loginWithFaceLeft: calc(50% - (.5*@loginWithFaceWidth) );
+
+#login {
+  z-index: 1000;
+  position: absolute;
+  top:  @loginTop;
+  left: @loginLeft;
+  
+  box-sizing: border-box;
+  height: @loginHeight;
+  width:  @loginWidth;
+  
+  border: @loginBorderWidth solid rgba(20, 20, 20, .66);
+  
+  box-shadow: 1px 1px 7px rgba(0,0,0,.5),
+              0 0 3em rgba(0,0,0,.33);
+  
+  text-align: left;
+  
+  &.hasface {
+    left: @loginWithFaceLeft;
+    width: @loginWithFaceWidth;
+  }
+  
+  &,
+  #face,
+  > div
+  {
+    transition-duration: .3s;
+    transition-property: width, left, right, border-radius, padding, margin;
+  }
+  
+  #face,
+  > div
+  {
+    position: absolute;
+    top: 0;
+  }
+  #face {
+    left: 0;
+    height: @loginInnerHeight;
+    width:  @loginInnerHeight;
+  }
+  > div {
+    right: 0;
+    padding: @loginPadding;
+    background-color: #1d1d1d;
+    
+    fieldset {
+      @bw: 1px;
+      position: relative;
+      font-size: 1.2rem;
+      margin: -@bw -@bw calc(1rem - @bw) -@bw; /* compensate border */
+      border-width: @bw;
+      border-color: #111 #242424 #242424 #111;
+      background: linear-gradient(to bottom, #131313 0, #191919 100%) repeat scroll 0% 0% transparent;
+      &:last-child {
+        margin-bottom: -@bw;
+      }
+    }
+    
+    input, label, button, .dropdown-toggle {
+      display: block;
+      height: @loginInputHeight;
+      line-height: @loginInputHeight;
+    }
+    label, button, .dropdown-toggle {
+      width: @loginInputHeight;
+      text-align: center;
+      background-color: rgba(15,15,15,.7);
+    }
+    input, label {
+      float: left;
+      box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .33);
+    }
+    button, .dropdown-toggle {
+      float: right;
+      box-shadow: inset -1px 1px 2px rgba(0, 0, 0, .33);
+      &:hover { color: inherit; }
+    }
+    input {
+      width: @loginInputWidth;
+      padding: 0 .66rem;
+      box-shadow: inset 1px 1px 4px rgba(0, 0, 0, .33);
+    }
+    .fa {
+      // line-height: @loginInputHeight;
+      color: #777;
+    }
+    
+    // users dropdown
+    ul {
+      z-index: 1;
+      position: absolute;
+      top: @loginInputHeight;
+      box-sizing: content-box;
+      width: 100%;
+      
+      padding: .25rem 1px;
+      margin: 1px -1px;
+      
+      background-color: #161616;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, .5);
+      
+      overflow: auto;
+      
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition-duration: .3s;
+      transition-property: opacity, max-height;
+      
+      &.expanded {
+        opacity: 1;
+        max-height: 20em;
+      }
+      
+      > li {
+        > a {
+          display: block;
+          padding: .25rem .5rem;
+          margin: 1px -1px;
+          &:hover, &:focus, &:active {
+            background-color: @highlightBg;
+          }
+          img, .fa {
+            display: inline-block;
+            margin-right: .5em;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            vertical-align: middle;
+            text-align: center;
+            background-color: #222;
+          }
+        }
+        &.loggedIn > a::after {
+          content: "Logged In";
+          display: inline-block;
+          float: right;
+          margin-right: .5rem;
+          line-height: 2rem;
+          vertical-align: middle;
+          color: #8f8;
+          font-variant: small-caps;
+          word-spacing: -.5em;
+        }
+      }
+    }
+  }
+}

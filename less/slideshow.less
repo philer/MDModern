@@ -1,0 +1,33 @@
+
+/*** SLIDESHOW ***/
+
+#bg0, #bg1 {
+  position: absolute;
+  top: @panelHeight;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-position: center center;
+  background-size: cover;
+  .filename {
+    position: absolute;
+    left: .5em;
+    bottom: .5em;
+    opacity: .5;
+    &:hover { opacity: 1; }
+  }
+}
+
+
+#slideshowControls {
+  position: absolute;
+  height: 2em;
+  line-height: 2em;
+  right: 1em;
+  bottom: 1em;
+  a {
+    padding: 0 .5em;
+    opacity: .5;
+    &:hover { opacity: 1; }
+  }
+}

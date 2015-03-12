@@ -1,0 +1,219 @@
+/*** PANEL ***/
+
+@panelHeight: 5rem;
+@panelBgColor: #111;
+@panelBorder: 1px solid #292929;
+@panelShadow: 1px 1px 5px rgba(0,0,0,.5);
+
+#panel {
+  position: relative;
+  height: @panelHeight;
+  line-height: @panelHeight;
+  background-color: @panelBgColor;
+  box-shadow: @panelShadow;
+  text-align: center;
+  
+  a:hover {
+    background-color: @highlightBg;
+  }
+  
+  > h1,
+  > nav,
+  > ul,
+  > ul > li,
+  > ul > li > a,
+  // > ul > li > a > span,
+  #countdown
+  {
+    display: inline-block;
+    height: @panelHeight;
+    line-height: @panelHeight;
+    vertical-align: middle;
+  }
+  
+  span {
+    display: inline-block;
+    line-height: 2em;
+    padding: 0 .5em;
+  }
+  
+  .fa {
+    font-size: 1.5rem;
+    line-height: @panelHeight;
+    vertical-align: middle;
+    padding: 0 .5em;
+  }
+  
+  h1 {
+    position: absolute;
+    left: (.5*@panelHeight);
+    font-size: 1.2rem;
+  }
+  
+  #menu {
+    position: absolute;
+    right: (.5*@panelHeight);
+    
+    // border-left: 1px solid black;
+    > li {
+      position: relative;
+      // border-right: 1px solid black;
+      border-left: @panelBorder;
+      &:last-child {
+        border-right: @panelBorder;
+      }
+      
+      min-width: @panelHeight;
+      
+      > a {
+        min-width: @panelHeight;
+        padding: 0 1rem;
+        font-size: 1.2rem;
+      }
+    }
+    
+    .tooltip {
+      position: absolute;
+      top: @panelHeight;
+      right: 0;
+      margin-top: 10px;
+      
+      background-color: @panelBgColor;
+      box-shadow: 1px 1px 5px rgba(0,0,0,.4);
+      border-radius: 2px;
+      
+      visibility: hidden;
+      opacity: 0;
+      transition-duration: .5s;
+      transition-delay: .1s;
+      transition-property: top, opacity, visibility;
+      
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: -20px;
+        right: 10px;
+        height: 0;
+        width: 0;
+        border: 10px solid transparent;
+        border-bottom-color: @panelBgColor;
+      }
+      > * {
+        max-height: 90vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
+    li:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+  
+  #countdown {
+    font-size: 1.75em;
+    font-weight: bold;
+    line-height: @panelHeight;
+    width: @panelHeight;
+    
+    // keep sessions aligned to center
+    margin-right: -@panelHeight;
+  }
+}
+
+
+/*** session navigation ***/
+
+#sessionNav {
+  z-index: 700;
+  position: relative;
+  min-width: (3*@panelHeight);
+}
+#sessionLabel,
+#session
+{
+  z-index: 1;
+  position: relative;
+  display: block;
+  height: @defaultLineHeight;
+  line-height: @defaultLineHeight;
+  box-sizing: content-box;
+  background-color: @panelBgColor;
+  border: @panelBorder;
+  border-width: 0 1px;
+}
+#sessionLabel {
+  padding-top: (.5*@panelHeight - @defaultLineHeight);
+}
+#session {
+  padding: 0 1rem (.5*@panelHeight - @defaultLineHeight);
+}
+#sessions,
+#session
+{
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+#sessions {
+  z-index: 0;
+  position: relative;
+  top: -20rem;
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  
+  opacity: 0;
+  visibility: hidden;
+  transition-duration: .5s;
+  transition-property: top, opacity, visibility, border, box-shadow;
+  
+  background-color: @panelBgColor;
+  
+  li {
+    margin: 1px 0;
+    a {
+      display: block;
+      padding: .66em 1em;
+    }
+  }
+}
+#sessionNav:hover #sessions {
+  top: 0;
+  opacity: 1;
+  visibility: visible;
+  border-bottom: 1rem solid @panelBgColor;
+  box-shadow: @panelShadow;
+}
+
+
+/*** language navigation ***/
+
+#languageNav {
+  position: relative;
+}
+
+#language{
+  font-size: 1.5em;
+  &:before {
+    .font-awesome(@faComment);
+    padding-right: .33em;
+  }
+}
+#languages {
+  white-space: nowrap;
+  text-align: left;
+  a {
+    display: block;
+    line-height: 2em;
+    margin-bottom: 1px;
+    padding: .5em;
+    
+    .code {
+      opacity: .5;
+      // width: 2em;
+      width: 4em;
+    }
+  }
+}

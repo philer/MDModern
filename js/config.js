@@ -108,7 +108,11 @@
       this.request.open("GET", this.filename);
       this.request.addEventListener("load", this._loaded.bind(this));
       this.request.responseType = "text";
-      this.request.send();
+      try {
+        this.request.send();
+      } catch(e){
+        console.log("error while trying to load '" + this.filename + "': " + e);
+      }
     },
     
     _loaded: function() {

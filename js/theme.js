@@ -12,12 +12,12 @@
   "use strict";
   
   var body           = $(document.body),
-      loginbox       = $("#loginbox"),
-      userlistToggle = $("#userlist-toggle", loginbox),
-      usernameInput  = $("#username", loginbox),
-      passwordInput  = $("#password", loginbox),
-      faceElem       = $("#face", loginbox),
-      usersUl        = $("#users", loginbox),
+      loginForm      = $("#login"),
+      usernameInput  = $("#username", loginForm),
+      passwordInput  = $("#password", loginForm),
+      userlistToggle = $("#userlist-toggle", loginForm),
+      faceElem       = $("#face", loginForm),
+      usersUl        = $("#users", loginForm),
       users          = [],
       selectedUser,
       countdownElem  = $("#countdown"),
@@ -44,7 +44,7 @@
     selectUser(evt, mdm.getUser(this.value));
   });
   
-  $("form", loginbox).submit(login);
+  loginForm.submit(login);
   
   $("#shutdown a").click(mdm.shutdown);
   $("#restart a").click(mdm.restart);
@@ -140,7 +140,7 @@
   }
   
   /**
-   * Sets the face image next to the loginbox
+   * Sets the face image next to the loginForm
    * if the currently selected user has one.
    * The relevant file is
    * /home/{username}/.face
@@ -148,18 +148,18 @@
    * @param  {User} user   user object
    */
   function updateFace(user) {
-    loginbox.removeClass("hasface");
+    loginForm.removeClass("hasface");
     
     if (!(user && user.img)) return;
     
     if (user.img.loaded) {
       faceElem.attr("src", user.img.src);
-      loginbox.addClass("hasface");
+      loginForm.addClass("hasface");
     } else {
       $(user.img).one("load", function() {
         if (user == selectedUser)
         faceElem.attr("src", user.img.src);
-        loginbox.addClass("hasface");
+        loginForm.addClass("hasface");
       });
     }
   }

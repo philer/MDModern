@@ -72,21 +72,25 @@
       <pre id="log"></pre>
       <p id="msg"></p>
       
-      <div id="loginbox">
-          <img id="face" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><form>
+      <form id="login">
+        <img id="face" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><div>
           <fieldset>
             <label for="username"><i class="fa fa-user"></i></label>
-            <input id="username" autofocus="autofocus" type="text">
-            <a id="userlist-toggle"><i class="fa fa-caret-down"></i></a>
+            <input type="text"
+                   id="username"
+                   autofocus
+                   autocomplete="off"
+                   />
+            <a class="dropdown-toggle" id="userlist-toggle"><i class="fa fa-caret-down"></i></a>
             <ul id="users"></ul>
           </fieldset>
           <fieldset>
             <label for="password"><i class="fa fa-key"></i></label>
-            <input id="password" type="password">
+            <input type="password" id="password" />
             <button type="submit"><i class="fa fa-check"></i></button>
           </fieldset>
-        </form>
-      </div>
+        </div>
+      </form>
       
       <span id="slideshowControls">
          <a id="cycleBgBack"><i class="fa fa-chevron-left"></i></a
