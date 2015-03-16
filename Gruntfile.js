@@ -55,8 +55,8 @@ module.exports = function(grunt) {
     concat: {
       dev: {
         src: [
-          '<%= jsFiles %>',
           'console/console.js',
+          '<%= jsFiles %>',
           'console/mdm-console.js',
         ],
         dest: '<%= dirs.out %>/<%= pkg.name %>.js'

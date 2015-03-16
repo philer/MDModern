@@ -43,8 +43,8 @@
   var mdm = win.mdm = {},
      $mdm = $(mdm),
       
-      // true if mdm_add_user has been called at least once
-      userSelected = false,
+      // true-ish if mdm_set_current_user has been called at least once
+      selectedUser = null,
       
       // true if mdm_noecho has been called more recently then mdm_prompt
       passwordExpected = false,
@@ -75,8 +75,8 @@
     .on("usernamePrompt", function() {
       passwordExpected = false;
     })
-    .one("userSelected", function(evt, username) {
-      userSelected = true;
+    .on("userSelected", function(evt, user) {
+      selectedUser = user.name;
     });
   
   /**
@@ -118,14 +118,16 @@
    * @param  {String|User} user  username or User object
    * @return {mdm}               chainable
    */
-  mdm.selectUser = function(user) {
-    if (typeof user !== "string") user = user.name;
-    
-    passwordExpected = false;
-    
-    HtmlConsole.log("MDM: sending username");
-    alert("USER###" + user);
-    
+  mdm.selectUser = function(username) {
+    if (typeof username !== "string") {
+      username = username.name;
+    }
+    if (username !== selectedUser) {
+      passwordExpected = false;
+      
+      HtmlConsole.log("MDM: sending username");
+      alert("USER###" + username);
+    }
     return mdm;
   };
   
@@ -142,7 +144,7 @@
     // we need to make sure the password is only sent when MDM expects it,
     // otherwise the LOGIN###... alert will be interpreted as a username.
     
-    if (!userSelected) return;
+    if (!selectedUser) return;
     
     if (passwordExpected) {
       _sendPassword(password);
