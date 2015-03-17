@@ -15,7 +15,7 @@
       + '<form id="console-form"><input id="console-input" type="text" autocomplete="off"/>'
       + '<button>»</button></form>'
     
-    , defaultDepth = 3
+    , defaultDepth = 1
     
     , getById     = doc.getElementById.bind(doc)
     , createElem  = doc.createElement.bind(doc)
@@ -146,11 +146,10 @@
    * @param  {string} loglevel  optional class (e.g. 'error' -> 'console-error-line')
    */
   function appendLogLine(msg, loglevel) {
-    logElem.insertAdjacentHTML('beforeend', 
-        '<div class="console-line'
-      + (loglevel ? " console-" + loglevel + "-line" : "")
-      + '">' + msg + '</div>'
-    );
+    var div = createElem("div");
+    div.className = "console-line" + (loglevel ? " console-" + loglevel + "-line" : "");
+    div.appendChild(doc.createTextNode(msg));
+    logElem.appendChild(div);
     
     // scroll down
     logElem.scrollTop = logElem.scrollHeight - logElem.offsetHeight;
