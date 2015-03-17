@@ -4,7 +4,7 @@
  * If the functions already exist they will be wrapped and still function as before.
  * 
  * globals:
- *   HtmlConsole
+ *   console
  *   mdm_enable
  *   mdm_disable
  *   mdm_prompt
@@ -29,7 +29,7 @@
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  */
-(function(win, cnsl) {
+(function(win, console) {
   
   "use strict";
   
@@ -63,13 +63,13 @@
     win[name] = function() {
     
       var args = [].slice.apply(arguments);
-      cnsl.log("MDM called '" + name + "(" + args.join(',') + ")'", "input");
+      console.log("MDM called '" + name + "(" + args.join(',') + ")'", "input");
     
       if (typeof original === "function") {
         try {
           original.apply(win, args);
         } catch (e) {
-          cnsl.error(e);
+          console.error(e);
         }
         
       }
@@ -83,4 +83,4 @@
   //   real_alert(msg);
   // }
   
-})(window, HtmlConsole);
+})(window, window.console);

@@ -40,12 +40,25 @@
 .console-line:first-child {
   border: 0 transparent;
 }
-.console-inputline {
-  color: #999;
-}
-.console-errorline {
+.console-error-line {
   color: #f99;
 }
+.console-error-line:before {
+  content: "✖ ";
+}
+.console-warning-line {
+  color: #fc9;
+}
+.console-warning-line:before {
+  content: "❗ ";
+}
+.console-input-line {
+  color: #999;
+}
+.console-input-line:before {
+  content: "» ";
+}
+
 #console-log::-webkit-scrollbar,
 #console-log::-webkit-scrollbar-track,
 #console-log::-webkit-scrollbar-thumb {

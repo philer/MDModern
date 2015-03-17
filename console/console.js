@@ -1,64 +1,122 @@
 /**
  * Basic JavaScript Console built on html.
  * 
- * globals: HtmlConsole
+ * globals: console
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function(doc, undefined) {
+(function(win, doc, undefined) {
   
   "use strict";
   
   var template = '<pre id="console-log"></pre>'
       + '<form id="console-form"><input id="console-input" type="text" autocomplete="off"/>'
-      + '<button>»</button></form>';
+      + '<button>»</button></form>'
+    
+    , defaultDepth = 3
+    
+    , getById     = doc.getElementById.bind(doc)
+    , createElem  = doc.createElement.bind(doc)
+    
+    , rollback    = []
+    , rollbackId  = 0
+    
+    , consoleElem = getById("console")
+    , inputElem
+    , logElem
+    ;
   
-  var cnsl = window.HtmlConsole = {},
-      
-      getId      = doc.getElementById.bind(doc),
-      createElem = doc.createElement.bind(doc),
-      
-      rollback   = [],
-      rollbackId = 0,
-      
-      consoleElem = getId("console"),
-      inputElem,
-      logElem;
+  
+  var origConsole = win.console
+    , console
+      = win.console
+      = win.HtmlConsole
+      = Object.create(origConsole, {
+        
+        /**
+         * Render a user friendly string representation of arbitrary data
+         * 
+         * @param  {mixed}   x
+         * @param  {integer} depth nesting depth to be displayed
+         * @return {string}
+         */
+          format: {
+            value: format,
+          },
+          
+          /**
+           * Log a line
+           */
+          log: {
+            value: function() {
+              appendLogLine(formatAll(arguments));
+              origConsole.log.apply(origConsole, arguments);
+              return this;
+            },
+          },
+          
+          /**
+           * Log a warning line
+           */
+          warn: {
+            value: function() {
+              appendLogLine(formatAll(arguments), "warning");
+              origConsole.warn.apply(origConsole, arguments);
+              return this;
+            },
+          },
+          
+          /**
+           * Log an error line
+           */
+          error: {
+            value: function() {
+              appendLogLine(formatAll(arguments), "error");
+              origConsole.error.apply(origConsole, arguments);
+              return this;
+            },
+          },
+          
+          /**
+           * Execute a command
+           * @param  {string} cmd
+           */
+          exec: {
+            value: function(cmd) {
+              logInput(cmd);
+              try {
+                this.log(eval.call(null, cmd));
+              } catch (e) {
+                this.error(e);
+              }
+              return this;
+            },
+          },
+          
+        });
   
   /// INIT
+  
   function init() {
     if (!consoleElem) {
       consoleElem = doc.body.appendChild(createElem("div"));
       consoleElem.id = "console";
     }
     consoleElem.innerHTML = template;
-    inputElem = getId("console-input");
-    logElem   = getId("console-log");
+    inputElem = getById("console-input");
+    logElem   = getById("console-log");
     
-    getId("console-form").addEventListener("submit", submit);
+    getById("console-form").addEventListener("submit", submit);
     inputElem.addEventListener("keydown", keyNav);
     consoleElem.addEventListener("click", inputElem.focus.bind(inputElem));
     // inputElem.focus();
     
-    cnsl.log("HtmlConsole on '" + navigator.userAgent + "'");
+    console.log("HtmlConsole on '" + navigator.userAgent + "'");
   }
   
   /// Functions
-  
-  /**
-   * Execute a command
-   * @param  {string} cmd
-   */
-  cnsl.exec = function exec(cmd) {
-    logInput(cmd);
-    try {
-      cnsl.log(eval.call(null, cmd));
-    } catch (e) {
-      cnsl.error(e);
-    }
-  };
   
   /**
    * Submit handler for console input form
@@ -66,12 +124,9 @@
    */
   function submit(evt) {
     evt.preventDefault();
-    
     var cmd = inputElem.value;
+    console.exec(cmd);
     inputElem.value = "";
-    
-    cnsl.exec(cmd);
-    
     inputElem.focus();
   }
   
@@ -82,46 +137,22 @@
   function logInput(cmd) {
     rollback.push(cmd);
     rollbackId = rollback.length;
-    cnsl.log("» " + cmd, "input");
+    appendLogLine(cmd, "input");
   }
   
   /**
-   * Log a line
-   * @param  {mixed} msg
+   * Create a single log line in the log element.
+   * @param  {array}  msg       string to be logged
+   * @param  {string} loglevel  optional class (e.g. 'error' -> 'console-error-line')
    */
-  cnsl.log = function log(msg, loglevel) {
-    var origMsg = msg;
+  function appendLogLine(msg, loglevel) {
+    logElem.insertAdjacentHTML('beforeend', 
+        '<div class="console-line'
+      + (loglevel ? " console-" + loglevel + "-line" : "")
+      + '">' + msg + '</div>'
+    );
     
-    if (loglevel !== "input") {
-      msg = cnsl.formatString(msg, 3);
-    }
-    
-    var div = createElem("div");
-    div.className = "console-line" + (loglevel ? " console-" + loglevel + "line" : "");
-    div.appendChild(doc.createTextNode(msg));
-    logElem.appendChild(div);
-    scrollLog();
-    
-    if (origMsg instanceof Error) {
-      // console.error(origMsg instanceof Error ? origMsg.message : origMsg);
-      throw origMsg;
-    } else {
-      console.log(origMsg);
-    }
-  };
-  
-  /**
-   * Log an error line
-   * @param  {Error|string} msg
-   */
-  cnsl.error = function error(msg) {
-    cnsl.log(msg, "error");
-  };
-  
-  /**
-   * Automatically scroll to the bottom of the log
-   */
-  function scrollLog() {
+    // scroll down
     logElem.scrollTop = logElem.scrollHeight - logElem.offsetHeight;
   }
   
@@ -162,16 +193,30 @@
   }
   
   /**
-   * Render a user friendly string representation of
-   * Arrays and Objects.
+   * Wrapper for format that allows formatting arrays
+   * into a single string
+   * @param  {Array} xs     array or array-like object of things to be formatted
+   * @param  {int}   depth  see format
+   * @return {string}
+   */
+  function formatAll(xs, depth) {
+    var formatted = [];
+    for (var i = xs.length ; i-- ; ) {
+      formatted[i] = format(xs[i], depth);
+    }
+    return formatted.join(", ");
+  }
+  
+  /**
+   * Render a user friendly string representation of arbitrary data
    * 
    * @param  {mixed}   x
    * @param  {integer} depth nesting depth to be displayed
    * @return {string}
    */
-  cnsl.formatString = function formatString(x, depth) {
+  function format(x, depth) {
     if (depth === undefined) {
-      depth = 1;
+      depth = defaultDepth;
     }
     
     switch (x) {
@@ -186,7 +231,7 @@
       return "["
         + x.map(
             function(elem) {
-              return depth ? formatString(elem, depth-1) : elem;
+              return depth ? format(elem, depth - 1) : elem;
             })
           .join(", ")
         + "]";
@@ -207,7 +252,7 @@
           + Object.getOwnPropertyNames(x)
               .map(
                 function(prop) {
-                  return prop + ": " + formatString(x[prop], depth-1);
+                  return prop + ": " + format(x[prop], depth - 1);
                 }) 
               .join(", ")
           + "}" : "{…}";
@@ -217,8 +262,8 @@
       default:
         return "" + x;
     }
-  };
+  }
   
   init();
   
-})(document);
+})(window, document);

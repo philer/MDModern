@@ -13,6 +13,7 @@
   
   var config = win.config = {
         require: require,
+        clear:   clear,
       }
     , configFiles = Object.create(null)
     ;
@@ -54,6 +55,17 @@
     return config;
   }
   
+  /**
+   * clear storage type in use
+   * @return {Object} config (chaining)
+   */
+  function clear() {
+    if (storage && storage.clear) {
+      storage.clear();
+    }
+    return config;
+  }
+  
   /// Model
   
   function ConfigFile(filename, parser, callback) {
@@ -65,7 +77,7 @@
       if (callback || (callback = parser)) {
         callback(this.parsed);
       }
-      console.log("found '" + filename + "' in storage");
+      console.log("found config '" + filename + "' in storage");
     }
     
     else {
@@ -102,7 +114,7 @@
     },
     
     _load: function() {
-      console.log("loading file '" + this.filename + "'");
+      console.log("loading config file '" + this.filename + "'");
       
       this.request = new XMLHttpRequest();
       this.request.open("GET", this.filename);
@@ -111,12 +123,17 @@
       try {
         this.request.send();
       } catch(e){
-        console.log("error while trying to load '" + this.filename + "': " + e);
+        console.error("error while loading config file '" + this.filename + "': " + e);
       }
     },
     
     _loaded: function() {
-      this.parsed = this.parser(this.request.responseText);
+      try {
+        this.parsed = this.parser(this.request.responseText);
+      } catch (e) {
+        console.error("error while parsing config file '" + this.filename + "': " + e);
+        return;
+      }
       if (storage) {
         storage.setItem(this.filename, JSON.stringify(this.parsed));
       }
@@ -162,7 +179,7 @@
       case "plain":
       // case "text":
       // default:
-        return function(text) { return text; };
+        return identity;
     }
     throw new Error('Config: Unknown parser "' + parser + "'");
   }

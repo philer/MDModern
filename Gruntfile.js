@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         '-W014': true,   // "Bad line break before '+'."
         '-W084': true,   // if (a = b)
         '-W093': true,   // return a = b;
-        "-W086": true,   // allow switch-case fall-through
+        // "-W086": true,   // allow switch-case fall-through
         validthis: true, // $(this) -> "Possible strict mode violation"
         
         globals: {
@@ -101,6 +101,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           compress: true,
+          cleancss: true,
           banner: '<%= default_banner %>',
           strictMath: true,
         },
@@ -123,7 +124,7 @@ module.exports = function(grunt) {
     
     watch: {
       stylesheets: {
-        files: '<%= dirs.less %>/**/*.less',
+        files: ['<%= dirs.less %>/**/*.less', 'console/**/*.css'],
         tasks: ['less:dev']
       },
       scripts: {
