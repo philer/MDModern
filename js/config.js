@@ -7,7 +7,7 @@
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function(win, storage) {
+(function(win, storage, undefined) {
   
   "use strict";
   
@@ -15,137 +15,87 @@
         require: require,
         clear:   clear,
       }
-    , configFiles = Object.create(null)
+    , cache = Object.create(null)
     ;
   
   /// Functions
   
-  /**
-   * Fetch a config file via request, maybe parse it, cache it, pass it on.
-   * 
-   * - filename may be a relative path or a full path,
-   *   starting with file:// or http://
-   * - parser (optional) may a string naming a predefined parser,
-   *   or a callback function. Predefined values are
-   *   "plain"       text is kept as is
-   *   "lines"       text is split into an array of lines,
-   *                 empty lines end comments are removed
-   *   "properties"  Default; Typical config file formatting is assumed.
-   *                 "key=value" lines are assigned as properties,
-   *                 with value being parsed by JSON.parse (if available)
-   *                 other lines, following a "[key]" line,
-   *                 are assigned as array elements to the "key" property.
-   *   "json"        File is parsed by JSON.parse (may not be available!)
-   * - callback (optional) is a function that is called with the results.
-   * 
-   * @param  {string}   filename
-   * @param  {mixed}    parser   string or function
-   * @param  {Function} callback called with results
-   * @return {config}            chaining
-   */
-  function require(filename, parser, callback) {
-    if (filename in configFiles) {
-      if (callback || (callback = parser)) {
-        configFiles[filename].addCallback(callback);
-      }
+  function require(filename, parser, useStorage) {
+    
+    if (filename in cache) {
+      return cache[filename];
     }
-    else {
-      configFiles[filename] = new ConfigFile(filename, parser, callback);
+    
+    if (typeof parser === "boolean") {
+      useStorage = parser;
+      parser = undefined;
     }
-    return config;
+    useStorage = storage && (useStorage === undefined || useStorage);
+    
+    if (useStorage && storage.hasOwnProperty(filename)) {
+      console.log("Config: Found config file '" + filename + "' in storage");
+      return cache[filename] = Promise.resolve(JSON.parse(storage.getItem(filename)));
+    }
+    
+    var interrupted = false;
+    
+    var errorLogger = function(action) {
+      return function(e) {
+        if (!interrupted) {
+          console.log("Config: Error while " + action + " config file '" + filename + "': " + e);
+          interrupted = true;
+        }
+        throw e;
+      };
+    };
+    
+    return cache[filename] = new Promise(function(success, fail) {
+        console.log("Config: Loading config file '" + filename + "'...");
+        var request = new XMLHttpRequest();
+        request.open("GET", filename);
+        request.responseType = "text";
+        request.addEventListener("load", function() {
+          if (request.status < 400) {
+            success(request.responseText);
+          }
+          else {
+            fail(Error(request.statusText));
+          }
+        });
+        request.send();
+      })
+      .catch(errorLogger("loading"))
+      
+      .then(getParserFunction(parser))
+      .catch(errorLogger("parsing"))
+      
+      .then(function(parsed) {
+        if (useStorage) {
+          storage.setItem(filename, JSON.stringify(parsed));
+        }
+        return parsed;
+      })
+      .catch(errorLogger("storing"));
   }
   
   /**
    * clear storage type in use
    * @return {Object} config (chaining)
    */
-  function clear() {
-    if (storage && storage.clear) {
-      storage.clear();
+  function clear(filename) {
+    if (storage) {
+      if (filename) {
+        delete storage.filename;
+      }
+      else {
+        storage.clear();
+      }
     }
     return config;
   }
   
-  /// Model
   
-  function ConfigFile(filename, parser, callback) {
-    
-    if (storage && storage.hasOwnProperty(filename)) {
-      this.parsed = JSON.parse(storage.getItem(filename));
-      this.loaded = true;
-    
-      if (callback || (callback = parser)) {
-        callback(this.parsed);
-      }
-      console.log("found config '" + filename + "' in storage");
-    }
-    
-    else {
-      this.loaded = false;
-      this.filename = filename;
-      this.callbacks = [];
-      
-      if (callback) {
-        this.parser = getParserFunction(parser);
-        this.callbacks.push(callback);
-      }
-      else {
-        // assume default parser
-        this.parser = parseProperties;
-        
-        // callback => parser
-        if (parser) {
-          this.callbacks.push(parser);
-        }
-      }
-      this._load();
-    }
-    
-  }
-  ConfigFile.prototype = {
-    
-    addCallback: function(fn) {
-      if (this.loaded) {
-        fn(this.parsed);
-      } else {
-        this.callbacks.push(fn);
-      }
-      return this;
-    },
-    
-    _load: function() {
-      console.log("loading config file '" + this.filename + "'");
-      
-      this.request = new XMLHttpRequest();
-      this.request.open("GET", this.filename);
-      this.request.addEventListener("load", this._loaded.bind(this));
-      this.request.responseType = "text";
-      try {
-        this.request.send();
-      } catch(e){
-        console.error("error while loading config file '" + this.filename + "': " + e);
-      }
-    },
-    
-    _loaded: function() {
-      try {
-        this.parsed = this.parser(this.request.responseText);
-      } catch (e) {
-        console.error("error while parsing config file '" + this.filename + "': " + e);
-        return;
-      }
-      if (storage) {
-        storage.setItem(this.filename, JSON.stringify(this.parsed));
-      }
-      this.loaded = true;
-      for (var i = 0, len = this.callbacks.length ; i < len ; ++i) {
-        this.callbacks[i](this.parsed);
-      }
-      delete this.callbacks;
-      delete this.request;
-    },
-    
-  };
+  /// PARSING
   
   // regular expressions for parsers
   var reValue   = /^(\S+)\s*=\s*(.*)$/
@@ -165,23 +115,21 @@
     }
     
     switch(parser) {
-      case "lines":
-        return getLines;
-      
+      case undefined:
+      case null:
       case "properties":
         return parseProperties;
       
-      case "json":
-        if (JSON) return JSON.parse;
-        else break;
-        
-        /* falls through */
       case "plain":
-      // case "text":
-      // default:
         return identity;
+      
+      case "lines":
+        return getLines;
+      
+      case "json":
+        return JSON.parse;
     }
-    throw new Error('Config: Unknown parser "' + parser + "'");
+    throw Error('Config: Unknown parser "' + parser + "'");
   }
   
   /**
@@ -236,7 +184,7 @@
             props[currentProp].push(line);
           }
           
-          else throw new Error("Config: Syntax error on line " + (lineNum + 1)
+          else throw Error("Config: Syntax error on line " + (lineNum + 1)
             + " '" + line + "'");
     });
     

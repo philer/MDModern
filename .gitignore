@@ -1,8 +1,56 @@
+### Hidden files ###
+.*
+~*
+*~
+._*
 
-#/min
+
+### GIT ###
+!.gitignore
+!.gitkeep
+!.gitattributes
+!.gitmodules
+!.githooks/
+
+### common project files ###
+
+!/.bowerrc
+!/.jshintrc
+
+tmp/
+*.tmp
+*.backup
+temp_*
+
+*.log
 
 *.conf
+!/example-*.conf
 
+*.zip
+*.xcf
+
+
+### Editors & IDEs ###
+
+## sublime text
 *.sublime-*
 
-/node_modules
+## other
+node_modules/
+bower_components/
+source/bower_components/
+.sass-cache
+.grunt
+
+.dropbox
+.gource.conf
+
+
+### OS files ###
+
+.DS_Store
+Thumbs.db
+*.swp
+.nfs*
+.~lock.*

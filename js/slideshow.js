@@ -423,6 +423,9 @@
     }
   });
   
-  config.require("slideshow.conf", init);
+  config.require("slideshow.conf", false).then(init)
+    .catch(function(){
+      console.log("failed to initialize slideshow");
+    });
   
 })(jQuery, window, document);
