@@ -63,7 +63,7 @@
     win[name] = function() {
     
       var args = [].slice.apply(arguments);
-      console.log("MDM called '" + name + "(" + args.join(',') + ")'", "input");
+      console.log("MDM called '" + name + "(" + args.join(',') + ")'");
     
       if (typeof original === "function") {
         try {

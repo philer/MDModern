@@ -9,6 +9,7 @@
  * 
  * globals:
  *   jQuery
+ *   console.log
  *   mdm
  *   mdm_enable
  *   mdm_disable
@@ -35,25 +36,29 @@
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function($, win) {
+(function(win, $, log) {
   
   "use strict";
   
   // export mdm object into global namespace
-  var mdm = win.mdm = {},
-     $mdm = $(mdm),
-      
+  var mdm = win.mdm = {}
+    , $mdm = $(mdm)
+    
       // true-ish if mdm_set_current_user has been called at least once
-      selectedUser = null,
+    , selectedUser = null
       
       // true if mdm_noecho has been called more recently then mdm_prompt
-      passwordExpected = false,
+    , passwordExpected = false
+    
+    , locked = true
       
-      users     = [],
-      sessions  = [],
-      languages = [];
+    , users     = []
+    , sessions  = []
+    , languages = []
+    , attempts  = []
+    ;
   
-  /// api functions
+  /// API functions ///
   
   /**
    * jQuery style event listener binding
@@ -69,34 +74,107 @@
   
   // listener used by the mdm module
   mdm
-    .on("passwordPrompt", function() {
-      passwordExpected = true;
-    })
-    .on("usernamePrompt", function() {
-      passwordExpected = false;
-    })
     .on("userSelected", function(evt, user) {
       selectedUser = user.name;
-    });
+    })
+    .on("passwordPrompt", function() {
+      passwordExpected = true; // set to false immediately when sending pw
+    })
+    .one("prompt", unlock)
+    ;
+  
+  
+  function lock() {
+    if (!locked) {
+      locked = true;
+      trigger('locked');
+      return true;
+    }
+    return false;
+  }
+  
+  function unlock() {
+    if (locked) {
+      locked = false;
+      trigger('unlocked');
+      return true;
+    }
+    return false;
+  }
+  
+  function _sendUser(user) {
+    log("MDM: sending username");
+    alert("USER###" + user);
+  }
+  
+  function _sendPassword(password) {
+    log("MDM: sending password");
+    passwordExpected = false;
+    alert("LOGIN###" + password);
+  }
   
   /**
-   * Attempt a login using the provided data.
-   * Convenience/Wrapper function for most use cases.
+   * Single-step login, expects both username and password at once.
    * 
-   * @param  {String|User} user      username or User object
-   * @param  {String}      password
-   * @return {mdm}                   chainable
+   * @param  {string|User} user
+   * @param  {string}      password
+   * @return {Object}      mdm (chaining)
    */
-  mdm.login = function(user, password, session, language) {
-    if (session) {
-      mdm.selectSession(session);
+  mdm.login = function(user, password) {
+    if (lock()) {
+      mdm.one("passwordPrompt", function() {
+        mdm.one("prompt", unlock);
+        _sendPassword(password);
+      });
+      _sendUser(user);
     }
-    if (language) {
-      mdm.selectLanguage(language);
+    return this;
+  };
+  
+  /**
+   * Send only the user who's account we want to log into. Use this
+   * for the traditional two-step login process and follow up by
+   * calling mdm.sendPassword(pw)
+   * 
+   * @param  {string|User} user
+   * @return {object}      mdm (chaining)
+   */
+  mdm.selectUser = function(user) {
+    user = ""+user;
+    if (user !== selectedUser && lock()) {
+      mdm.one("prompt", unlock);
+      _sendUser(user);
     }
-    return mdm
-      .selectUser(user)
-      .sendPassword(password);
+    return this;
+  };
+  
+  /**
+   * Send only the password, assuming we have already set a user
+   * for login. If no user has been selected yet nothing will happen.
+   * 
+   * @param  {string} password
+   * @return {Object} mdm (chaining)
+   */
+  mdm.sendPassword = function(password) {
+    if (lock()) {
+      if (passwordExpected) {
+        mdm.one("prompt", unlock);
+        _sendPassword(password);
+        
+      } else if (selectedUser) {
+        
+        // MDM will reset the user after three tries. We will
+        // just set the user again in that case, unless no user
+        // has been selected at all so far. We then send the PW
+        // as soon as MDM asks for it.
+        mdm.one("passwordPrompt", function() {
+          mdm.one("prompt", unlock);
+          _sendPassword(password);
+        });
+        _sendUser(selectedUser);
+      }
+    }
+    return this;
   };
   
   /**
@@ -114,63 +192,7 @@
   };
   
   /**
-   * Send username to MDM as the user who is logging in.
-   * @param  {String|User} user  username or User object
-   * @return {mdm}               chainable
-   */
-  mdm.selectUser = function(username) {
-    if (typeof username !== "string") {
-      username = username.name;
-    }
-    if (username !== selectedUser) {
-      passwordExpected = false;
-      
-      console.log("MDM: sending username");
-      alert("USER###" + username);
-    }
-    return mdm;
-  };
-  
-  /**
-   * Sends a password. This function also makes sure the password
-   * is only sent when MDM expects it so as to not provoke an unexpected
-   * response.
-   * 
-   * @param  {string} password
-   * @return {mdm}              chainable
-   */
-  mdm.sendPassword = function(password) {
-    
-    // we need to make sure the password is only sent when MDM expects it,
-    // otherwise the LOGIN###... alert will be interpreted as a username.
-    
-    if (!selectedUser) return;
-    
-    if (passwordExpected) {
-      _sendPassword(password);
-    } else {
-      mdm.one("passwordPrompt", function() {
-        _sendPassword(password);
-      });
-    }
-    
-    return mdm;
-  };
-  
-  /**
-   * Private; send the password now
-   * Throws error if MDM isn't expecting a password
-   * @see  mdm.sendPassword
-   * @param  {string} password
-   */
-  function _sendPassword(password) {
-    console.log("MDM: sending password");
-    alert("LOGIN###" + password);
-    passwordExpected = false;
-  }
-  
-  /**
-   * Find an existing Session by its filen ame
+   * Find an existing Session by its file name
    * 
    * @param  {String}  session_file file name
    * @return {Session}
@@ -190,9 +212,8 @@
    * @return {mdm}             chainable
    */
   mdm.selectSession = function(session) {
-    console.log("MDM: sending session info");
+    log("MDM: sending session info");
     alert("SESSION###" + session.name + "###" + session.file);
-    trigger("sessionSelected", session);
     return mdm;
   };
   
@@ -217,9 +238,8 @@
    * @return {mdm}               chainable
    */
   mdm.selectLanguage = function(language) {
-    console.log("MDM: sending language info");
+    log("MDM: sending language info");
     alert("LANGUAGE###" + language.code);
-    trigger("languageSelected", language);
     return mdm;
   };
   
@@ -229,7 +249,7 @@
    * @return {mdm}    chainable
    */
   mdm.shutdown = function() {
-    console.log("MDM: sending force-shutdown request");
+    log("MDM: sending force-shutdown request");
     alert("FORCE-SHUTDOWN###");
     return mdm;
   };
@@ -240,7 +260,7 @@
    * @return {mdm}    chainable
    */
   mdm.restart = function() {
-    console.log("MDM: sending force-restart request");
+    log("MDM: sending force-restart request");
     alert("FORCE-RESTART###");
     return mdm;
   };
@@ -251,7 +271,7 @@
    * @return {mdm}    chainable
    */
   mdm.suspend = function() {
-    console.log("MDM: sending force-suspend request");
+    log("MDM: sending force-suspend request");
     alert("FORCE-SUSPEND###");
     return mdm;
   };
@@ -262,7 +282,7 @@
    * @return {mdm}    chainable
    */
   mdm.quit = function() {
-    console.log("MDM: sending quit request");
+    log("MDM: sending quit request");
     alert("QUIT###");
     return mdm;
   };
@@ -275,7 +295,7 @@
    * @param  {mixed } evtData optional
    */
   function trigger(evtName, evtData) {
-    console.log("EVENT: " + evtName, evtData);
+    log("EVENT: " + evtName, evtData);
     $mdm.triggerHandler(evtName, evtData);
   }
   
@@ -289,7 +309,7 @@
    * @param {string} gecos     full name etc.
    * @param {string} status    online?
    */
-  function User(username, gecos, loggedIn) {
+  function User(username, gecos, loggedIn, facefile) {
     
     /**
      * login name
@@ -306,20 +326,21 @@
     this.gecos = gecos;
     
     /**
-     * online loggedIn
+     * user online? false if no, localized string if yes
      * 
-     * @type {boolean}
+     * @type {boolean|string}
      */
-    this.loggedIn = !!loggedIn;
+    this.loggedIn = loggedIn || false;
     
     /**
-     * User's home directory
-     * Set to /home/{username} by default
-     * and then updated using passwd if available
+     * Path to User's facefile (aka. avatar)
      * 
-     * @type {String}
+     * Earlier versions of MDM don't provide this parameter
+     * so we default to the usual path `/home/<username>/.face`
+     * 
+     * @type {string}
      */
-    this.home = "file:///home/" + username;
+    this.facefile = facefile || "file:///home/" + username + "/.face";
   }
   User.prototype = {
     
@@ -460,15 +481,17 @@
   // Called by MDM to allow the user to input a username
   win.mdm_prompt = function(message) {
     trigger("usernamePrompt");
+    trigger("prompt");
   };
   // Called by MDM to allow the user to input a password
   win.mdm_noecho = function(message) {
     trigger("passwordPrompt");
+    trigger("prompt");
   };
   
   // Called by MDM to add a user to the list of users
-  win.mdm_add_user = function(username, gecos, status) {
-    var user = new User(username, gecos, status);
+  win.mdm_add_user = function(username, gecos, status, facefile) {
+    var user = new User(username, gecos, status, facefile);
     users.push(user);
     trigger("userAdded", user);
   };
@@ -497,11 +520,11 @@
   
   // Called by MDM to show an error
   win.mdm_error = function(message) {
-    trigger("error", message);
+    if (message) trigger("error", message);
   };
   // Called by MDM to show a message (usually "Please enter your username")
   win.mdm_msg = function(message) {
-    trigger("message", message);
+    if (message) trigger("message", message);
   };
   // Called by MDM to show a timed login countdown
   win.mdm_timed = function(message) {
@@ -511,7 +534,7 @@
   
   // Called by MDM to set the welcome message
   win.set_welcome_message = function(message) {
-    trigger("welcomeMessage", message);
+    if (message) trigger("welcomeMessage", message);
   };
   
   // Called by MDM to update the clock
@@ -543,4 +566,4 @@
   };
   
   
-})(jQuery, window);
+})(window, jQuery, console.log.bind(console));
