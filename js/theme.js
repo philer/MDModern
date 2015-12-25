@@ -14,12 +14,12 @@
   "use strict";
   
   var $countdown = $("#countdown")
-    , $msgBox    = $("#msg")
+    , $messages  = $("#messages")
     ;
   
   /// MDM listeners ///
   
-  mdm.on("error",          showMsg)
+  mdm.on("message error",  showMessage)
      .on("loginCountdown", updateCountdown)
      .on("shutdownHidden", function() { $("#shutdown").hide(); })
      .on("restartHidden",  function() { $("#restart").hide(); })
@@ -29,8 +29,8 @@
   
   /// DOM listeners ///
   
-  // hide errors and messages by clicking
-  $msgBox.click(function() { $(this).fadeOut(); });
+  // // hide errors and messages by clicking
+  // $msgBox.click(function() { $(this).fadeOut(); });
   
   $("#shutdown a").click(mdm.shutdown);
   $("#restart a").click(mdm.restart);
@@ -54,18 +54,25 @@
    * @param  {event}     evt  optional mdm event
    * @param  {string}    msg
    */
-  function showMsg(evt, msg) {
+  function showMessage(evt, msg) {
     if (!msg) return;
     
-    if (evt.namespace == "error") {
-      $msgBox.addClass("error");
-    } else {
-      $msgBox.removeClass("error");
+    var t = new Date();
+    
+    var $msg = $(
+        '<li class="message"><time datetime="'
+      + t.toISOString() + '">'
+      + t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds()
+      + '</time>' + msg + '</li>'
+      );
+    
+    if (evt.namespace === "error") {
+      $msg.addClass("error");
     }
     
-    $msgBox
-      .html(msg)
-      .fadeIn()
+    $messages
+      .append($msg)
+      .animate({ scrollTop: $messages.height() }, 500)
       ;
   }
   

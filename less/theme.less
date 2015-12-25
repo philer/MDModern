@@ -124,28 +124,30 @@ input
 }
 
 
-/*** misc ***/
+@import "panel.less";
+@import "login.less";
 
-#msg {
+#messages {
   z-index: 100;
   position: absolute;
-  top: 5rem;
-  width: 60%;
-  margin: 0 20%;
-  font-size: 1.2em;
-  line-height: 3rem;
-  background: linear-gradient(to bottom, #1A1A1A 0, #2F2F2F 100%) repeat scroll 0% 0% transparent;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, .4);
-  cursor: pointer;
-  &.error {
-    background: linear-gradient(to bottom, #5F1F1F 0, #4A0A0A 100%) repeat scroll 0% 0% transparent;
+  margin: 2rem 25%;
+  width: 50%;
+  height: calc(50% - (2rem + .5*@loginHeight + 2rem));
+  
+  overflow: auto;
+  
+  .message {
+    margin: .25em;
+    padding: 1em;
+    background-color: rgba(10,10,10,.8);
+    border-radius: 3px;
+    
+    > time {
+      opacity: .5;
+      margin-right: .5em;
+    }
   }
 }
 
-
-/*** imports ***/
-
-@import "panel.less";
-@import "login.less";
 @import "slideshow.less";
 @import "console.less";
