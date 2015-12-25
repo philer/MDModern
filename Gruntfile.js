@@ -21,14 +21,16 @@ module.exports = function(grunt) {
       '<%= dirs.js %>/mdm.js',
       '<%= dirs.js %>/config.js',
       
-      // theme base
+      // theme modules
       '<%= dirs.js %>/theme.js',
-      
-      // optional modules
+      '<%= dirs.js %>/login.js',
       '<%= dirs.js %>/session.js',
       '<%= dirs.js %>/language.js',
       '<%= dirs.js %>/slideshow.js',
-      '<%= dirs.js %>/lsb_release.js',
+      
+      // use this if you need info from /etc/lsb-release
+      // other than DISTRIB_DESCRIPTION
+      // '<%= dirs.js %>/lsb_release.js',
     ],
     
     jshint: {
