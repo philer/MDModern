@@ -127,6 +127,24 @@ input
 @import "panel.less";
 @import "login.less";
 
+#countdown-bar {
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 0;
+  width: 100%;
+  
+  transition: width 1s linear, height .3s;
+  
+  background-color: white;
+  
+  &.running {
+    height: 2px;
+    box-shadow: @panelShadow;
+  }
+}
+
 #messages {
   z-index: 100;
   position: absolute;

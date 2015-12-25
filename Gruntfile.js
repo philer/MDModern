@@ -22,7 +22,9 @@ module.exports = function(grunt) {
       '<%= dirs.js %>/config.js',
       
       // theme modules
-      '<%= dirs.js %>/theme.js',
+      '<%= dirs.js %>/buttons.js',
+      '<%= dirs.js %>/messages.js',
+      '<%= dirs.js %>/countdown.js',
       '<%= dirs.js %>/login.js',
       '<%= dirs.js %>/session.js',
       '<%= dirs.js %>/language.js',

@@ -13,8 +13,10 @@
   
   "use strict";
   
-  var $countdown = $("#countdown")
-    , $messages  = $("#messages")
+  var $messages     = $("#messages")
+    , $countdown    = $("#countdown")
+    , $countdownBar = $("#countdown-bar")
+    , countdownMax  = -1
     ;
   
   /// MDM listeners ///
@@ -37,11 +39,11 @@
   $("#suspend a").click(mdm.suspend);
   $("#quit a").click(mdm.quit);
   
-  
   /// FUNCTIONS ///
   
   /**
    * Make countdown times visible and set time
+   * 
    * @param  {event} evt   optional
    * @param  {int}   time  time remaining until automatic login
    */
@@ -49,8 +51,17 @@
     $countdown.text(time);
   }
   
+  function updateCountdownBar(evt, time) {
+    if (time > countdownMax) {
+      countdownMax = time;
+      $countdownBar.addClass('running');
+    }
+    $countdownBar.css({ width: (100 * time/countdownMax) + "%" });
+  }
+  
   /**
    * Display a regular message to the user
+   * 
    * @param  {event}     evt  optional mdm event
    * @param  {string}    msg
    */
