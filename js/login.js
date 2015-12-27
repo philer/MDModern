@@ -30,9 +30,7 @@
   
   mdm.on("userAdded",      addUser)
      .on("userSelected",   selectUser)
-     .on("usernamePrompt", function() { $username.select(); })
      .one("passwordPrompt", function() { $password.select(); })
-     // .on("error",           showMsg)
      ;
   
   /// DOM listeners ///
@@ -43,7 +41,6 @@
   });
   
   $loginForm.submit(login);
-  
   
   /// FUNCTIONS ///
   
