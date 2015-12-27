@@ -42,20 +42,26 @@
   
   // export mdm object into global namespace
   var mdm = win.mdm = {}
+  
+      // event target (jQuery event aggregate)
     , $mdm = $(mdm)
     
-      // true-ish if mdm_set_current_user has been called at least once
+      // unique username
     , selectedUser = null
-      
-      // true if mdm_noecho has been called more recently then mdm_prompt
-    , passwordExpected = false
     
-    , locked = true
-      
+      // unique session_file
+    , selectedSession = null
+    
+      // unique language_code
+    , selectedLanguage = null
+    
     , users     = []
     , sessions  = []
     , languages = []
-    , attempts  = []
+    
+      // true if mdm_noecho has been called more recently then mdm_prompt
+    , passwordExpected = false
+    , locked = true
     ;
   
   /// API functions ///
@@ -74,9 +80,9 @@
   
   // listener used by the mdm module
   mdm
-    .on("userSelected", function(evt, user) {
-      selectedUser = user.name;
-    })
+    // .on("userSelected", function(evt, user) {
+    //   selectedUser = user.name;
+    // })
     .on("passwordPrompt", function() {
       passwordExpected = true; // set to false immediately when sending pw
     })
@@ -509,13 +515,22 @@
   };
   
   win.mdm_set_current_user = function(username) {
-    trigger("userSelected", mdm.getUser(username) || new User(username));
+    if (username && selectedUser !== username) {
+      selectedUser = username;
+      trigger("userSelected", mdm.getUser(username) || new User(username));
+    }
   };
   win.mdm_set_current_session = function(session_name, session_file) {
-    trigger("sessionSelected", mdm.getSession(session_file));
+    if (selectedSession !== session_file) {
+      selectedSession = session_file;
+      trigger("sessionSelected", mdm.getSession(session_file));
+    }
   };
   win.mdm_set_current_language = function(language_name, language_code) {
-    trigger("languageSelected", mdm.getLanguage(language_code));
+    if (selectedLanguage !== language_code) {
+      selectedLanguage = language_code;
+      trigger("languageSelected", mdm.getLanguage(language_code));
+    }
   };
   
   // Called by MDM to show an error

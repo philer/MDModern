@@ -15,7 +15,8 @@
   
   /// MDM listeners ///
   
-  mdm.on("message error",  showMessage);
+  // mdm.on("message",  showMessage);
+  mdm.on("error",  showMessage);
   
   /// DOM listeners ///
   
@@ -42,12 +43,12 @@
       + '</time>' + msg + '</li>'
       );
     
-    if (evt.namespace === "error") {
-      $msg.addClass("error");
-    }
+    // if (evt.type === "error") {
+    //   $msg.addClass("error");
+    // }
     
     $messages
-      .append($msg)
+      .append($msg.fadeIn())
       .animate({ scrollTop: $messages.height() }, 500)
       ;
   }

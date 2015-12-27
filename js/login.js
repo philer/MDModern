@@ -30,8 +30,8 @@
   
   mdm.on("userAdded",      addUser)
      .on("userSelected",   selectUser)
-     .on("usernamePrompt", function() { $usernameInput.select(); })
-     .on("passwordPrompt", function() { $password.select(); })
+     .on("usernamePrompt", function() { $username.select(); })
+     .one("passwordPrompt", function() { $password.select(); })
      // .on("error",           showMsg)
      ;
   
@@ -55,6 +55,7 @@
   function login(evt) {
     evt.preventDefault();
     mdm.login($username[0].value, $password[0].value);
+    $password.select();
   }
   
   /**
