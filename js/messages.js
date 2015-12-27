@@ -34,13 +34,11 @@
   function showMessage(evt, msg) {
     if (!msg) return;
     
-    var t = new Date();
-    
     var $msg = $(
-        '<li class="message"><time datetime="'
-      + t.toISOString() + '">'
-      + t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds()
-      + '</time>' + msg + '</li>'
+        '<li class="message">'
+      // + timeTag()
+      + msg
+      + '</li>'
       );
     
     // if (evt.type === "error") {
@@ -52,5 +50,13 @@
       .animate({ scrollTop: $messages.height() }, 500)
       ;
   }
+  
+  // function timeTag() {
+  //   var t = new Date();
+  //   return '<time datetime="'
+  //        + t.toISOString() + '">'
+  //        + t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds()
+  //        + '</time>';
+  // }
   
 })(mdm, jQuery);
