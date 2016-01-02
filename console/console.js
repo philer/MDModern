@@ -1,13 +1,13 @@
 /**
  * Basic JavaScript Console built on html.
  * 
- * globals: console
+ * exports: htmlConsole
  * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function(win, doc, undefined) {
+(function(win, doc, origConsole, undefined) {
   
   "use strict";
   
@@ -29,10 +29,9 @@
     ;
   
   
-  var origConsole = win.console
-    , console
+  var console
       = win.console
-      = win.HtmlConsole
+      = win.htmlConsole
       = Object.create(origConsole, {
         
         /**
@@ -53,7 +52,7 @@
             value: function() {
               appendLogLine(formatAll(arguments));
               origConsole.log.apply(origConsole, arguments);
-              return this;
+              return console;
             },
           },
           
@@ -64,7 +63,7 @@
             value: function() {
               appendLogLine(formatAll(arguments), "warning");
               origConsole.warn.apply(origConsole, arguments);
-              return this;
+              return console;
             },
           },
           
@@ -75,7 +74,7 @@
             value: function() {
               appendLogLine(formatAll(arguments), "error");
               origConsole.error.apply(origConsole, arguments);
-              return this;
+              return console;
             },
           },
           
@@ -91,10 +90,27 @@
               } catch (e) {
                 this.error(e);
               }
-              return this;
+              return console;
             },
           },
           
+          track: {
+            value: function(name, fn) {
+              if (!fn) {
+                fn = name;
+                name = fn.name || "[anonymous function]";
+              }
+              return function() {
+                console.log("called '" + name + "(" + formatAll(arguments) + ")'");
+                
+                try {
+                  fn.apply(this, arguments);
+                } catch (e) {
+                  console.error(e);
+                }
+              };
+            },
+          },
         });
   
   /// INIT
@@ -113,7 +129,7 @@
     consoleElem.addEventListener("click", inputElem.focus.bind(inputElem));
     // inputElem.focus();
     
-    console.log("HtmlConsole on '" + navigator.userAgent + "'");
+    console.log("Initialized htmlConsole on '" + navigator.userAgent + "'");
   }
   
   /// Functions
@@ -265,4 +281,4 @@
   
   init();
   
-})(window, document);
+})(window, window.document, window.console);

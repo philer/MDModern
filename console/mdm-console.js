@@ -29,7 +29,7 @@
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  */
-(function(win, console) {
+(function(win, htmlConsole) {
   
   "use strict";
   
@@ -56,31 +56,10 @@
     "mdm_hide_quit",
     "mdm_hide_xdmcp",
   
-  ].map(function(name) {
-  
-    var original = win[name];
+  ].forEach(function(name) {
     
-    win[name] = function() {
+    win[name] = htmlConsole.track(name, win[name]);
     
-      var args = [].slice.apply(arguments);
-      console.log("MDM called '" + name + "(" + args.join(',') + ")'");
-    
-      if (typeof original === "function") {
-        try {
-          original.apply(win, args);
-        } catch (e) {
-          console.error(e);
-        }
-        
-      }
-    };
-  
   });
   
-  // var real_alert = win.alert;
-  // win.alert = function(msg) {
-  //   cnsl.log("» 'alert(" + msg + ")'");
-  //   real_alert(msg);
-  // }
-  
-})(window, window.console);
+})(window, htmlConsole);

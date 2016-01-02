@@ -36,7 +36,7 @@
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function(win, $, log) {
+(function(win, $) {
   
   "use strict";
   
@@ -109,12 +109,12 @@
   }
   
   function _sendUser(user) {
-    log("MDM: sending username");
+    console.log("MDM: sending username");
     alert("USER###" + user);
   }
   
   function _sendPassword(password) {
-    log("MDM: sending password");
+    console.log("MDM: sending password");
     passwordExpected = false;
     alert("LOGIN###" + password);
   }
@@ -218,7 +218,7 @@
    * @return {mdm}             chainable
    */
   mdm.selectSession = function(session) {
-    log("MDM: sending session info");
+    console.log("MDM: sending session info");
     alert("SESSION###" + session.name + "###" + session.file);
     return mdm;
   };
@@ -244,7 +244,7 @@
    * @return {mdm}               chainable
    */
   mdm.selectLanguage = function(language) {
-    log("MDM: sending language info");
+    console.log("MDM: sending language info");
     alert("LANGUAGE###" + language.code);
     return mdm;
   };
@@ -255,7 +255,7 @@
    * @return {mdm}    chainable
    */
   mdm.shutdown = function() {
-    log("MDM: sending force-shutdown request");
+    console.log("MDM: sending force-shutdown request");
     alert("FORCE-SHUTDOWN###");
     return mdm;
   };
@@ -266,7 +266,7 @@
    * @return {mdm}    chainable
    */
   mdm.restart = function() {
-    log("MDM: sending force-restart request");
+    console.log("MDM: sending force-restart request");
     alert("FORCE-RESTART###");
     return mdm;
   };
@@ -277,7 +277,7 @@
    * @return {mdm}    chainable
    */
   mdm.suspend = function() {
-    log("MDM: sending force-suspend request");
+    console.log("MDM: sending force-suspend request");
     alert("FORCE-SUSPEND###");
     return mdm;
   };
@@ -288,7 +288,7 @@
    * @return {mdm}    chainable
    */
   mdm.quit = function() {
-    log("MDM: sending quit request");
+    console.log("MDM: sending quit request");
     alert("QUIT###");
     return mdm;
   };
@@ -301,7 +301,7 @@
    * @param  {mixed } evtData optional
    */
   function trigger(evtName, evtData) {
-    log("EVENT: " + evtName, evtData);
+    console.log("EVENT: " + evtName, evtData);
     $mdm.triggerHandler(evtName, evtData);
   }
   
@@ -581,4 +581,4 @@
   };
   
   
-})(window, jQuery, console.log.bind(console));
+})(window, jQuery);

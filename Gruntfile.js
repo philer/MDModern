@@ -75,7 +75,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           namespace: [
-            'console', 'HtmlConsole', 'cnsl',
+            'console', 'htmlConsole',
           ],
           methods: [
             'log', 'warn', 'error', 'info', 'exec', 'formatString',
