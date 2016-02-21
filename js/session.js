@@ -11,13 +11,15 @@
   
   "use strict";
   
-  var sessionElem    = $("#session"),
-      sessionsUl     = $("#sessions"),
-      selectedSession;
+  var $sessionElem = $("#session")
+    , $sessionsUl  = $("#sessions")
+    , selectedSession
+    ;
   
   // MDM listeners
   mdm.on("sessionAdded",    addSession)
-     .on("sessionSelected", selectSession);
+     .on("sessionSelected", selectSession)
+     ;
   
   /// FUNCTIONS ///
   
@@ -29,13 +31,13 @@
    * @return {publicAPI}      chainable
    */
   function addSession(evt, session) {
-    session.li = $(document.createElement("li"))
+    session.$li = $(document.createElement("li"))
       .append(
         $("<a>" + session.name + "</a>")
           .click(session.select.bind(session))
       );
     
-    sessionsUl.append(session.li);
+    $sessionsUl.append(session.$li);
     
     if (!selectedSession) {
       selectedSession = session;
@@ -50,9 +52,9 @@
    * @return {publicAPI}        chainable
    */
   function selectSession(evt, session) {
-    selectedSession.li.removeClass("selected");
-    sessionElem.html(session.name);
-    session.li.addClass("selected");
+    selectedSession.$li.removeClass("selected");
+    $sessionElem.html(session.name);
+    session.$li.addClass("selected");
     selectedSession = session;
   }
   

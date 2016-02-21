@@ -11,12 +11,14 @@
   
   "use strict";
   
-  var languageElem = $("#language"),
-      languagesUl  = $("#languages"),
-      selectedLanguage;
+  var $languageElem = $("#language")
+    , $languagesUl  = $("#languages")
+    , selectedLanguage
+    ;
   
-  mdm.on("languageAdded", addLanguage)
-     .on("languageSelected", selectLanguage);
+  mdm.on("languageAdded",    addLanguage)
+     .on("languageSelected", selectLanguage)
+     ;
   
   /// FUNCTIONS ///
   
@@ -28,7 +30,7 @@
    * @return {publicAPI}          chainable
    */
   function addLanguage(evt, language) {
-    language.li = $(document.createElement("li"))
+    language.$li = $(document.createElement("li"))
       .append(
         $(
           '<a><span class="code">'
@@ -40,7 +42,7 @@
         .click(language.select.bind(language))
       );
     
-    languagesUl.append(language.li);
+    $languagesUl.append(language.li);
     
     // show first language by default
     if (!selectedLanguage) {
@@ -56,9 +58,9 @@
    * @return {publicAPI}           chainable
    */
   function selectLanguage(evt, language) {
-    selectedLanguage.li.removeClass("selected");
-    languageElem.html(language.shortCode());
-    language.li.addClass("selected");
+    selectedLanguage.$li.removeClass("selected");
+    $languageElem.html(language.shortCode());
+    language.$li.addClass("selected");
     selectedLanguage = language;
     
   }
