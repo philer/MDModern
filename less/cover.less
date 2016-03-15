@@ -1,0 +1,28 @@
+#fade-in-cover {
+  z-index: 99999;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1s, visibility 1s;
+  
+  // > img {
+  //   @size: 200px;
+  //   position: absolute;
+  //   top:  calc(50% - (@size/2));
+  //   left: calc(50% - (@size/2));
+  //   height: @size;
+  //   width: @size;
+  // }
+  
+  &.ready {
+    opacity: 0;
+    visibility: hidden;
+    // > img {
+    //   display: none;
+    // }
+  }
+  
+}
