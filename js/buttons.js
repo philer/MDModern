@@ -2,28 +2,24 @@
  * System power state buttons for MDModern theme.
  * All buttons use the backend's confirmation free commands.
  * 
- * globals: jQuery mdm
- * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
-(function(mdm, $) {
+
+import './mdm.js';
+import $ from 'jQuery';
+
+["shutdown", "restart", "suspend", "quit"].forEach(function(name) {
   
-  "use strict";
+  var $btn = $("#" + name);
   
-  ["shutdown", "restart", "suspend", "quit"].forEach(function(name) {
+  if ($btn.length) {
     
-    var $btn = $("#" + name);
+    mdm.on(name + "Hidden", function() { $btn.hide(); });
     
-    if ($btn.length) {
-      
-      mdm.on(name + "Hidden", function() { $btn.hide(); });
-      
-      $btn.find("a").click(mdm[name]);
-      
-    }
+    $btn.find("a").click(mdm[name]);
     
-  });
+  }
   
-})(mdm, jQuery);
+});

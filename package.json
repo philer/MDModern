@@ -1,21 +1,22 @@
 {
   "name": "MDModern",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "GPL-3.0+",
-  
   "author": {
     "name": "Philipp Miller",
     "url": "http://github.com/philer"
   },
-  
   "devDependencies": {
-    "grunt": "~0.4.5",
-    "load-grunt-tasks": "~3.1.0",
-    "grunt-contrib-less": "~1.0.0",
-    "grunt-contrib-uglify": "~0.8.0",
-    "grunt-contrib-concat": "~0.5.1",
-    "grunt-contrib-watch": "~0.6.1",
-    "grunt-remove-logging": "~0.2.0",
-    "grunt-contrib-jshint": "~0.11.0"
+    "babel-eslint": "~6.0.0",
+    "babel-preset-es2015-rollup": "~1.1.1",
+    "rollup": "~0.25.4",
+    "rollup-plugin-babel": "~2.4.0",
+    "rollup-plugin-eslint": "~2.0.0",
+    "rollup-plugin-uglify": "~0.3.1",
+    "rollup-plugin-json": "~2.0.0"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint MDM"
   }
 }
