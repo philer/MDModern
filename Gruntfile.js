@@ -30,6 +30,8 @@ module.exports = function(grunt) {
       '<%= dirs.js %>/language.js',
       '<%= dirs.js %>/slideshow.js',
       
+      '<%= dirs.js %>/cover.js',
+      
       // use this if you need info from /etc/lsb-release
       // other than DISTRIB_DESCRIPTION
       // '<%= dirs.js %>/lsb_release.js',
@@ -75,7 +77,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           namespace: [
-            'console', 'HtmlConsole', 'cnsl',
+            'console', 'htmlConsole',
           ],
           methods: [
             'log', 'warn', 'error', 'info', 'exec', 'formatString',
