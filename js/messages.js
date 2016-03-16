@@ -6,7 +6,8 @@
  * 
  */
 
-import './mdm.js';
+import mdm from './mdm.js';
+import $ from 'jQuery';
 
 var $messages = $("#messages");
 

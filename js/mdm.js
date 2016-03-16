@@ -7,31 +7,6 @@
  * events. MDM provided data is accessible through getters.
  * Outgoing communication is wrapped in callable functions.
  * 
- * globals:
- *   jQuery
- *   console.log
- *   mdm
- *   mdm_enable
- *   mdm_disable
- *   mdm_prompt
- *   mdm_noecho
- *   mdm_add_user
- *   mdm_add_session
- *   mdm_add_language
- *   mdm_set_current_user
- *   mdm_set_current_session
- *   mdm_set_current_language
- *   mdm_error
- *   mdm_msg
- *   mdm_timed
- *   set_welcome_message
- *   set_clock
- *   mdm_hide_shutdown
- *   mdm_hide_restart
- *   mdm_hide_suspend
- *   mdm_hide_quit
- *   mdm_hide_xdmcp
- * 
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
@@ -40,7 +15,8 @@ import win from 'window';
 import $ from 'jQuery';
 
 // export mdm object into global namespace
-export default mdm = {};
+var mdm = {};
+export default mdm;
 
 // event target (jQuery event aggregate)
 var $mdm = $(mdm);

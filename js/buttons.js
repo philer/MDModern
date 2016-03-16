@@ -7,7 +7,7 @@
  * 
  */
 
-import './mdm.js';
+import mdm from './mdm.js';
 import $ from 'jQuery';
 
 ["shutdown", "restart", "suspend", "quit"].forEach(function(name) {

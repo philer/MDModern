@@ -9,14 +9,14 @@
   "devDependencies": {
     "babel-eslint": "~6.0.0",
     "babel-preset-es2015-rollup": "~1.1.1",
+    "eslint": "~2.4.0",
     "rollup": "~0.25.4",
     "rollup-plugin-babel": "~2.4.0",
-    "rollup-plugin-eslint": "~2.0.0",
-    "rollup-plugin-uglify": "~0.3.1",
-    "rollup-plugin-json": "~2.0.0"
+    "rollup-plugin-json": "~2.0.0",
+    "rollup-plugin-uglify": "~0.3.1"
   },
   "scripts": {
-    "build": "rollup -c",
-    "lint": "eslint MDM"
+    "build": "npm run lint; rollup -c",
+    "lint": "eslint js/**"
   }
 }

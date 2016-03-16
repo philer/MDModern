@@ -11,6 +11,7 @@
 import win from 'window';
 import console from 'console';
 
+var storage = win.localStorage;
 var cache = Object.create(null);
 
 /// Functions

@@ -8,7 +8,7 @@
  * 
  */
 
-import './mdm.js';
+import mdm from './mdm.js';
 import $ from 'jQuery';
 
 var $body            = $(document.body);
