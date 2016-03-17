@@ -11,9 +11,9 @@
 import mdm from './mdm.js';
 import $ from 'jQuery';
 
-var $sessionElem = $("#session");
-var $sessionsUl  = $("#sessions");
-var selectedSession;
+const $sessionElem = $("#session");
+const $sessionsUl  = $("#sessions");
+let selectedSession;
 
 // MDM listeners
 mdm.on("sessionAdded",    addSession)

@@ -16,28 +16,30 @@ import $ from 'jQuery';
 import console from 'console';
 
 // export mdm object into global namespace
-let mdm = {};
+const mdm = {};
 export default mdm;
 
 // event target (jQuery event aggregate)
-var $mdm = $(mdm);
+const $mdm = $(mdm);
+
+const users     = [];
+
+const sessions  = [];
+
+const languages = [];
 
 // unique username
-var selectedUser = null;
+let selectedUser = null;
 
 // unique session_file
-var selectedSession = null;
+let selectedSession = null;
 
 // unique language_code
-var selectedLanguage = null;
-
-var users     = [];
-var sessions  = [];
-var languages = [];
+let selectedLanguage = null;
 
 // true if mdm_noecho has been called more recently then mdm_prompt
-var passwordExpected = false;
-var locked = true;
+let passwordExpected = false;
+let locked = true;
 
 /// API functions ///
 
@@ -165,7 +167,7 @@ mdm.sendPassword = function(password) {
  * @return {User}
  */
 mdm.getUser = function(username) {
-  for (var i = 0, len = users.length ; i < len ; ++i) {
+  for (let i = 0, len = users.length ; i < len ; ++i) {
     if (users[i].name === "" + username) {
       return users[i];
     }
@@ -179,7 +181,7 @@ mdm.getUser = function(username) {
  * @return {Session}
  */
 mdm.getSession = function(session_file) {
-  for (var i = 0, len = sessions.length ; i < len ; ++i) {
+  for (let i = 0, len = sessions.length ; i < len ; ++i) {
     if (sessions[i].file === "" + session_file) {
       return sessions[i];
     }
@@ -205,7 +207,7 @@ mdm.selectSession = function(session) {
  * @return {Language}
  */
 mdm.getLanguage = function(code) {
-  for (var i = 0, len = languages.length ; i < len ; ++i) {
+  for (let i = 0, len = languages.length ; i < len ; ++i) {
     if (languages[i].code === "" + code) {
       return languages[i];
     }
@@ -472,19 +474,19 @@ win.mdm_noecho = function(/*message*/) {
 
 // Called by MDM to add a user to the list of users
 win.mdm_add_user = function(username, gecos, status, facefile) {
-  var user = new User(username, gecos, status, facefile);
+  const user = new User(username, gecos, status, facefile);
   users.push(user);
   trigger("userAdded", user);
 };
 // Called by MDM to add a session to the list of sessions
 win.mdm_add_session = function(session_name, session_file) {
-  var session = new Session(session_name, session_file);
+  const session = new Session(session_name, session_file);
   sessions.push(session);
   trigger("sessionAdded", session);
 };
 // Called by MDM to add a language to the list of languages
 win.mdm_add_language = function(language_name, language_code) {
-  var language = new Language(language_name, language_code);
+  const language = new Language(language_name, language_code);
   languages.push(language);
   trigger("languageAdded", language);
 };

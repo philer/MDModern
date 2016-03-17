@@ -9,9 +9,9 @@
 import mdm from './mdm.js';
 import $ from 'jQuery';
 
-var $countdown    = $("#countdown");
-var $countdownBar = $("#countdown-bar");
-var countdownMax  = -1;
+const $countdown    = $("#countdown");
+const $countdownBar = $("#countdown-bar");
+let countdownMax  = -1;
 
 /// MDM listeners ///
 

@@ -12,7 +12,7 @@ import $ from 'jQuery';
 
 ["shutdown", "restart", "suspend", "quit"].forEach(function(name) {
   
-  var $btn = $("#" + name);
+  const $btn = $("#" + name);
   
   if ($btn.length) {
     

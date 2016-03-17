@@ -54,8 +54,8 @@ const defaultSettings = {
 
 function init(cfg) {
   
-  var parents = doc.getElementsByClassName("slideshow");
-  var parent = parents.length ? parents[0] : doc.body;
+  const parents = doc.getElementsByClassName("slideshow");
+  const parent = parents.length ? parents[0] : doc.body;
   
   if (!cfg.grid || cfg.grid === "1x1" || !/^\d+x\d+$/.test(cfg.grid)) {
     console.log("initializing slideshow");
@@ -86,11 +86,11 @@ function Slideshow(parent, cfg) {
   this.parent.insertAdjacentHTML('afterbegin', template);
   
   // initialize layers
-  var elems         = this.parent.getElementsByClassName("slideshow-layer")
-    , filenameElems = this.parent.getElementsByClassName("slideshow-filename")
-    ;
+  const elems         = this.parent.getElementsByClassName("slideshow-layer");
+  const filenameElems = this.parent.getElementsByClassName("slideshow-filename");
+  
   this.layers = [];
-  for (var i = 0, len = elems.length ; i < len ; ++i) {
+  for (let i = 0, len = elems.length ; i < len ; ++i) {
     this.layers[i] = new Layer(this, elems[i], filenameElems[i]);
   }
   this.currentLayer = 0;
@@ -157,7 +157,7 @@ Slideshow.prototype = {
    * @return {this}   chaining
    */
   _btn: function(action) {
-    var btn = this.ctrlsElem.getElementsByClassName("slideshow-" + action);
+    const btn = this.ctrlsElem.getElementsByClassName("slideshow-" + action);
     if (btn.length) {
       btn[0].addEventListener("click", this[action].bind(this));
       return btn[0];
@@ -262,11 +262,11 @@ Slideshow.prototype = {
    */
   shuffle: function() {
     // sources = _.shuffle(sources);
-    var sources = this.sources
-      , i = sources.length
-      , tmp
-      , j
-      ;
+    const sources = this.sources;
+    let i = sources.length;
+    let tmp;
+    let j;
+    
     while(i--) {
       j = Math.floor(Math.random() * i);
       tmp = sources[i];
@@ -297,7 +297,7 @@ function Layer(slideshow, elem, filenameElem) {
 Layer.prototype = {
   
   show: function(img) {
-    var fillStyle = this.ss.cfg.fill_style
+    const fillStyle = this.ss.cfg.fill_style
       ? this.ss.cfg.fill_style
       : "50% 50% / " + this._getCssSizing(img) + " no-repeat";
     
@@ -322,10 +322,10 @@ Layer.prototype = {
   },
   
   hide: function() {
-    var s = this.ss.cfg.fade_seconds;
+    const s = this.ss.cfg.fade_seconds;
     
     // old image: put below and hide after fading
-    this.elemStyle.transition = "opacity "+s+"s,z-index 0s "+s+"s,visibility 0s "+s+"s";
+    this.elemStyle.transition = `opacity ${s}s,z-index 0s ${s}s,visibility 0s ${s}s`;
     this.elemStyle.zIndex     = 0;
     this.elemStyle.opacity    = 0;
     this.elemStyle.visibility = "hidden";
@@ -340,12 +340,12 @@ Layer.prototype = {
    */
   _getCssSizing: function(img) {
     // return "cover";
-    var rect = this.elem.getBoundingClientRect();
-    var eh = rect.bottom - rect.top;
-    var ew = rect.right  - rect.left;
-    var ih = img.naturalHeight;
-    var iw = img.naturalWidth;
-    // var ratioDelta = Math.abs(eh/ew - ih/iw);
+    const rect = this.elem.getBoundingClientRect();
+    const eh = rect.bottom - rect.top;
+    const ew = rect.right  - rect.left;
+    const ih = img.naturalHeight;
+    const iw = img.naturalWidth;
+    // const ratioDelta = Math.abs(eh/ew - ih/iw);
     
     // very small
     if (ih < 0.6*eh && iw < 0.6*ew) {
@@ -374,16 +374,15 @@ Layer.prototype = {
  * Grid for multiple slideshows at the same time
  */
 function Grid(parent, cfg) {
-  var rowsAndCols = cfg.grid.split("x")
-    , rows = rowsAndCols[0]
-    , cols = rowsAndCols[1]
-    , cell
-    ;
+  const rowsAndCols = cfg.grid.split("x");
+  const rows = rowsAndCols[0];
+  const cols = rowsAndCols[1];
+  let cell;
   
   this.slideshows = [];
   
-  for (var row = 0 ; row < rows ; ++row) {
-    for (var col = 0 ; col < cols ; ++col) {
+  for (let row = 0 ; row < rows ; ++row) {
+    for (let col = 0 ; col < cols ; ++col) {
       
       cell = doc.createElement("div");
       cell.style.position = "absolute";
@@ -417,7 +416,7 @@ Grid.prototype = {};
 Object.getOwnPropertyNames(Slideshow.prototype).forEach(function(prop) {
   if (prop[0] !== '_') {
     Grid.prototype[prop] = function() {
-      for (var i = 0, len = this.slideshows.length ; i < len ; ++i) {
+      for (let i = 0, len = this.slideshows.length ; i < len ; ++i) {
         this.slideshows[i][prop]();
       }
       return this;

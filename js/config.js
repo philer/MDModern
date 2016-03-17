@@ -11,8 +11,8 @@
 import win from 'window';
 import console from 'console';
 
-var storage = win.localStorage;
-var cache = Object.create(null);
+const storage = win.localStorage;
+const cache = Object.create(null);
 
 /// Functions
 
@@ -33,21 +33,19 @@ export function require(filename, parser, useStorage) {
     return cache[filename] = Promise.resolve(JSON.parse(storage.getItem(filename)));
   }
   
-  var interrupted = false;
+  let interrupted = false;
   
-  var errorLogger = function(action) {
-    return function(e) {
-      if (!interrupted) {
-        console.log("Config: Error while " + action + " config file '" + filename + "': " + e);
-        interrupted = true;
-      }
-      throw e;
-    };
+  const errorLogger = action => function(e) {
+    if (!interrupted) {
+      console.log("Config: Error while " + action + " config file '" + filename + "': " + e);
+      interrupted = true;
+    }
+    throw e;
   };
   
   return cache[filename] = new Promise(function(success, fail) {
       console.log("Config: Loading config file '" + filename + "'...");
-      var request = new XMLHttpRequest();
+      const request = new XMLHttpRequest();
       request.open("GET", filename);
       request.responseType = "text";
       request.addEventListener("load", function() {
@@ -92,11 +90,6 @@ export function clear(filename) {
 
 /// PARSING
 
-// regular expressions for parsers
-const reValue   = /^(\S+)\s*=\s*(.*)$/;
-const reArray   = /^\[(\S+)\]$/;
-const reComment = /^[^#"]*(:?"[^"]*"[^#"]*)*/;
-
 /**
  * Returns a Function that will be used as parser.
  * 
@@ -126,6 +119,11 @@ function getParserFunction(parser) {
   throw Error('Config: Unknown parser "' + parser + "'");
 }
 
+// regular expressions for parsers
+const reValue   = /^(\S+)\s*=\s*(.*)$/;
+const reArray   = /^\[(\S+)\]$/;
+const reComment = /^[^#"]*(:?"[^"]*"[^#"]*)*/;
+
 /**
  * split filecontents into an array of lines,
  * removing empty lines and comments after '#'
@@ -133,9 +131,23 @@ function getParserFunction(parser) {
  * @param  {string} text
  * @return {array}           array of strings
  */
-function getLines(text) {
-  return text.split("\n").map(trimComments).filter(identity);
-}
+const getLines = text => text.split("\n").map(trimComments).filter(identity);
+
+/**
+ * Remove comments preceded by "#" and trims whitespace.
+ * Comments do not have to start at the beginning of the line.
+ * 
+ * @param  {string} string
+ * @return {string}
+ */
+const trimComments = string => reComment.exec(string)[0];
+
+/**
+ * returns first argument unchanged, does nothing
+ * @param  {mixed} x
+ * @return {mixed} x
+ */
+const identity = x => x;
 
 /**
  * Smart properties parsing
@@ -146,9 +158,9 @@ function getLines(text) {
  * @return {Object}      object with assigned properties
  */
 function parseProperties(text) {
-  var props = {};
-  var currentProp;
-  var matches;
+  const props = {};
+  let currentProp;
+  let matches;
   
   text.split("\n")
     .map(trimComments)
@@ -181,26 +193,4 @@ function parseProperties(text) {
   });
   
   return props;
-}
-
-/**
- * Remove comments preceded by "#" and trims whitespace.
- * Comments do not have to start at the beginning of the line.
- * 
- * @param  {string} string
- * @return {string}
- */
-function trimComments(string) {
-  // var i = string.indexOf("#");
-  // return (0 <= i ? string.slice(0, i) : string).trim();
-  return reComment.exec(string)[0];
-}
-
-/**
- * returns first argument unchanged, does nothing
- * @param  {mixed} x
- * @return {mixed} x
- */
-function identity(x) {
-  return x;
 }

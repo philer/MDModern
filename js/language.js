@@ -9,9 +9,9 @@
 import mdm from './mdm.js';
 import $ from 'jQuery';
 
-var $languageElem = $("#language");
-var $languagesUl  = $("#languages");
-var selectedLanguage;
+const $languageElem = $("#language");
+const $languagesUl  = $("#languages");
+let selectedLanguage;
 
 mdm.on("languageAdded",    addLanguage)
    .on("languageSelected", selectLanguage)

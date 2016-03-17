@@ -32,16 +32,12 @@
       "sourceType": "module"
     },
     "rules": {
-      "strict": "error",
-      "semi": [
-        "error",
-        "always"
-      ],
-      "comma-dangle": [
-        "warn",
-        "always-multiline"
-      ],
-      "no-console": "off"
+      "block-scoped-var": "warn",
+      "comma-dangle": ["warn","always-multiline"],
+      "no-console": "off",
+      "no-var": "warn",
+      "semi": ["error","always"],
+      "strict": "error"
     },
     "env": {
       "browser": true,

@@ -9,7 +9,7 @@
 import mdm from './mdm.js';
 import $ from 'jQuery';
 
-var $messages = $("#messages");
+const $messages = $("#messages");
 
 /// MDM listeners ///
 
@@ -32,7 +32,7 @@ mdm.on("error",  showMessage);
 function showMessage(evt, msg) {
   if (!msg) return;
   
-  var $msg = $(
+  const $msg = $(
       '<li class="message">'
     // + timeTag()
     + msg

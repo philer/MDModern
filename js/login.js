@@ -11,17 +11,17 @@
 import mdm from './mdm.js';
 import $ from 'jQuery';
 
-var $body            = $(document.body);
-var $loginForm       = $("#login");
-var $username        = $("#username", $loginForm);
-var $password        = $("#password", $loginForm);
-var faceImgElem      = $("#face", $loginForm)[0];
+const $body            = $(document.body);
+const $loginForm       = $("#login");
+const $username        = $("#username", $loginForm);
+const $password        = $("#password", $loginForm);
+const faceImgElem      = $("#face", $loginForm)[0];
 
-var users            = [];
-var $userlistToggle  = $("#userlist-toggle", $loginForm);
-var $usersUl         = $("#users", $loginForm);
-var userlistExpanded = false;
-var selectedUser;
+const users            = [];
+const $userlistToggle  = $("#userlist-toggle", $loginForm);
+const $usersUl         = $("#users", $loginForm);
+let userlistExpanded = false;
+let selectedUser;
 
 /// MDM listeners ///
 
@@ -59,11 +59,10 @@ function login(evt) {
  * @param  {user}  user  user object
  */
 function addUser(evt, user) {
-  var $li   = $('<li>')
-    , $a    = $('<a>' + user.name + '</a>')
-    , $icon = $('<i class="fa fa-user">')
-    , img  = new Image()
-    ;
+  const $li   = $('<li>');
+  const $a    = $('<a>' + user.name + '</a>');
+  const $icon = $('<i class="fa fa-user">');
+  const img  = new Image();
   
   $usersUl.append(
     $li.append(

@@ -16,7 +16,7 @@
 import $ from 'jQuery';
 import * as config from 'config';
 
-var elems = $(".lsb-release");
+const elems = $(".lsb-release");
 
 if (elems.length) {
    config.require("file:///etc/lsb-release", parser)
@@ -27,12 +27,12 @@ if (elems.length) {
 function init(cfg) {
   console.log("lsb-release", cfg);
   
-  var keyRegex = /lsb-(distrib[_-]\w+)/i;
+  const keyRegex = /lsb-(distrib[_-]\w+)/i;
   
   elems.each(function(i, elem) {
-    var match = keyRegex.exec(elem.className);
+    const match = keyRegex.exec(elem.className);
     if (match.length) {
-      var key = match[1].toUpperCase().replace('-', '_');
+      const key = match[1].toUpperCase().replace('-', '_');
       if (cfg.hasOwnProperty(key)) {
         elem.innerHTML = cfg[key];
       }
@@ -41,10 +41,10 @@ function init(cfg) {
 }
 
 function parser(text) {
-  var props = {};
+  const props = {};
   text.split("\n").forEach(function(line) {
     if (line) {
-      var keyVal = line.split("=");
+      const keyVal = line.split("=");
       props[keyVal[0]] = keyVal[1].replace(/"/g, "");
     }
   });
