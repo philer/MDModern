@@ -340,13 +340,12 @@ Layer.prototype = {
    */
   _getCssSizing: function(img) {
     // return "cover";
-    var rect = this.elem.getBoundingClientRect()
-      , eh = rect.bottom - rect.top
-      , ew = rect.right  - rect.left
-      , ih = img.naturalHeight
-      , iw = img.naturalWidth
-      , ratioDelta = Math.abs(eh/ew - ih/iw)
-      ;
+    var rect = this.elem.getBoundingClientRect();
+    var eh = rect.bottom - rect.top;
+    var ew = rect.right  - rect.left;
+    var ih = img.naturalHeight;
+    var iw = img.naturalWidth;
+    // var ratioDelta = Math.abs(eh/ew - ih/iw);
     
     // very small
     if (ih < 0.6*eh && iw < 0.6*ew) {

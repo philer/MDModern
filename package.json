@@ -6,17 +6,49 @@
     "name": "Philipp Miller",
     "url": "http://github.com/philer"
   },
+  "scripts": {
+    "build": "rollup -c",
+    "prebuild": "npm run lint",
+    "lint": "eslint --color='true' --format 'node_modules/eslint-friendly-formatter' js/**"
+  },
+  "dependencies": {
+    "jquery": "~2.2.1"
+  },
   "devDependencies": {
     "babel-eslint": "~6.0.0",
     "babel-preset-es2015-rollup": "~1.1.1",
     "eslint": "~2.4.0",
+    "eslint-friendly-formatter": "~1.2.2",
     "rollup": "~0.25.4",
     "rollup-plugin-babel": "~2.4.0",
     "rollup-plugin-json": "~2.0.0",
     "rollup-plugin-uglify": "~0.3.1"
   },
-  "scripts": {
-    "build": "npm run lint; rollup -c",
-    "lint": "eslint js/**"
+  "eslintConfig": {
+    "root": true,
+    "extends": "eslint:recommended",
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "strict": "error",
+      "semi": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": [
+        "warn",
+        "always-multiline"
+      ],
+      "no-console": "off"
+    },
+    "env": {
+      "browser": true,
+      "jquery": true
+    },
+    "globals": {
+      "Promise": false
+    }
   }
 }

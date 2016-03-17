@@ -1,8 +1,8 @@
 import win from 'window';
 import $ from 'jQuery';
-import mdm from './mdm.js';
+// import mdm from './mdm.js';
 
-var $cover = $("#fade-in-cover")
+var $cover = $("#fade-in-cover");
 
 $(function() {
   

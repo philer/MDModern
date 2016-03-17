@@ -15,14 +15,16 @@ export default {
   plugins:    [
     json(),
     babel(babelOptions),
-    // uglify(),
+    uglify(),
   ],
+  intro: "var undefined;",
   globals: {
     jQuery: 'jQuery',
     window: 'window',
     document: 'document',
     body: 'document.body',
     console: 'console',
-    undefined: 'void 0',
+    // undefined: 'void 0',
   },
+  external: ['jQuery', 'window', 'document', 'body', 'console'],
 };

@@ -87,7 +87,6 @@ export function clear(filename) {
       storage.clear();
     }
   }
-  return config;
 }
 
 
@@ -149,8 +148,6 @@ function getLines(text) {
 function parseProperties(text) {
   var props = {};
   var currentProp;
-  var line;
-  var total;
   var matches;
   
   text.split("\n")
@@ -162,12 +159,12 @@ function parseProperties(text) {
         if (line === "") return;
         
         // property = value
-        if (matches = reValue.exec(line)) {
+        if ((matches = reValue.exec(line))) {
           props[matches[1]] = (JSON ? JSON.parse(matches[2]) : matches[2]);
         }
         
         // [property] array definition
-        else if (matches = reArray.exec(line)) {
+        else if ((matches = reArray.exec(line))) {
           currentProp = matches[1];
           if (!props.hasOwnProperty(currentProp)) {
             props[currentProp] = [];

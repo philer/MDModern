@@ -14,7 +14,7 @@
  */
 
 import $ from 'jQuery';
-import 'config';
+import * as config from 'config';
 
 var elems = $(".lsb-release");
 
