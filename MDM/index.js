@@ -1,3 +1,5 @@
+/*! MDM.js by Philipp Miller */
+
 /**
  * MDM backend abstraction layer
  * 
@@ -6,6 +8,8 @@
  * It tries to ensure synchronous execution of API calls.
  * 
  * @author  Philipp Miller
+ * @url     https://github.com/philer/MDModern
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * 
  */
 

@@ -6,39 +6,39 @@ import {selectSession} from './loginManager.js';
  * @param {string} name
  * @param {string} file
  */
-export default function Session(name, file) {
+export default class Session {
   
-  /**
-   * unique identifier
-   * 
-   * @type {String}
-   */
-  this.id = file;
-  
-  /**
-   * session name
-   * 
-   * @type {String}
-   */
-  this.name = name;
-  
-  /**
-   * session file name
-   * @type {String}
-   */
-  this.file = file;
-  
-}
-
-Session.prototype = {
+  constructor(name, file) {
+    
+    /**
+     * unique identifier
+     * 
+     * @type {String}
+     */
+    this.id = file;
+    
+    /**
+     * session name
+     * 
+     * @type {String}
+     */
+    this.name = name;
+    
+    /**
+     * session file name
+     * @type {String}
+     */
+    this.file = file;
+    
+  }
   
   /**
    * Tell MDM to use this session for upcoming login
    * @return {Session} chainable
    */
-  select: function() {
+  select() {
     selectSession(this);
     return this;
-  },
+  }
   
-};
+}

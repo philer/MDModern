@@ -4,7 +4,7 @@
   "license": "GPL-3.0+",
   "author": {
     "name": "Philipp Miller",
-    "url": "http://github.com/philer"
+    "url": "http://github.com/philer/MDModern"
   },
   "scripts": {
     "build": "npm run build:js && npm run build:css",
@@ -13,7 +13,7 @@
     "build:js": "rollup -c",
     "prebuild:js": "npm run lint",
     "dist:js": "NODE_ENV=production npm run build:js",
-    "build:css": "lessc --strict-math=on --source-map less/theme.less dist/MDModern.css",
+    "build:css": "lessc --strict-math=on --strict-units=on --source-map less/theme.less dist/MDModern.css",
     "dist:css": "npm run build:css -- --clean-css"
   },
   "dependencies": {},
