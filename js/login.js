@@ -8,7 +8,7 @@
  * 
  */
 
-import mdm from './mdm.js';
+import * as mdm from '../MDM/index.js';
 import $ from 'jQuery';
 
 const $body            = $(document.body);
@@ -25,10 +25,9 @@ let selectedUser;
 
 /// MDM listeners ///
 
-mdm.on("userAdded",      addUser)
-   .on("userSelected",   selectUser)
-   .one("passwordPrompt", function() { $password.select(); })
-   ;
+mdm.on("userAdded",      addUser);
+mdm.on("userSelected",   selectUser);
+mdm.once("passwordPrompt", function() { $password.select(); });
 
 /// DOM listeners ///
 

@@ -6,7 +6,7 @@
  * 
  */
 
-import mdm from './mdm.js';
+import {on} from '../MDM/index.js';
 import $ from 'jQuery';
 
 const $messages = $("#messages");
@@ -14,7 +14,7 @@ const $messages = $("#messages");
 /// MDM listeners ///
 
 // mdm.on("message",  showMessage);
-mdm.on("error",  showMessage);
+on("error",  showMessage);
 
 /// DOM listeners ///
 

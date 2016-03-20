@@ -6,16 +6,16 @@
  * 
  */
 
-import mdm from './mdm.js';
+import {on} from '../MDM/index.js';
 import $ from 'jQuery';
 
 const $languageElem = $("#language");
 const $languagesUl  = $("#languages");
 let selectedLanguage;
 
-mdm.on("languageAdded",    addLanguage)
-   .on("languageSelected", selectLanguage)
-   ;
+// MDM listeners
+on("languageAdded",    addLanguage);
+on("languageSelected", selectLanguage);
 
 /// FUNCTIONS ///
 
@@ -27,15 +27,12 @@ mdm.on("languageAdded",    addLanguage)
  * @return {publicAPI}          chainable
  */
 function addLanguage(evt, language) {
-  language.$li = $(document.createElement("li"))
+  language.$li = $("<li>")
     .append(
-      $(
-        '<a><span class="code">'
-      + language.countryCode()
-      + '</span><span class="name">'
-      + language.name
-      + '</span></a>'
-      )
+      $(`<a>
+          <span class="code">{language.countryCode()}</span>
+          <span class="name">{language.name}</span>
+        </a>`)
       .click(language.select.bind(language))
     );
   

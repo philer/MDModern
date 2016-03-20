@@ -8,7 +8,7 @@
  * 
  */
 
-import mdm from './mdm.js';
+import {on} from '../MDM/index.js';
 import $ from 'jQuery';
 
 const $sessionElem = $("#session");
@@ -16,9 +16,8 @@ const $sessionsUl  = $("#sessions");
 let selectedSession;
 
 // MDM listeners
-mdm.on("sessionAdded",    addSession)
-   .on("sessionSelected", selectSession)
-   ;
+on("sessionAdded",    addSession);
+on("sessionSelected", selectSession);
 
 /// FUNCTIONS ///
 
@@ -30,7 +29,7 @@ mdm.on("sessionAdded",    addSession)
  * @return {publicAPI}      chainable
  */
 function addSession(evt, session) {
-  session.$li = $(document.createElement("li"))
+  session.$li = $("<li>")
     .append(
       $("<a>" + session.name + "</a>")
         .click(session.select.bind(session))
