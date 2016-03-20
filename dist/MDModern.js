@@ -7,6 +7,40 @@
 	doc = 'default' in doc ? doc['default'] : doc;
 
 	var undefined;
+
+	var babelHelpers = {};
+
+	babelHelpers.asyncToGenerator = function (fn) {
+	  return function () {
+	    var gen = fn.apply(this, arguments);
+	    return new Promise(function (resolve, reject) {
+	      function step(key, arg) {
+	        try {
+	          var info = gen[key](arg);
+	          var value = info.value;
+	        } catch (error) {
+	          reject(error);
+	          return;
+	        }
+
+	        if (info.done) {
+	          resolve(value);
+	        } else {
+	          return Promise.resolve(value).then(function (value) {
+	            return step("next", value);
+	          }, function (err) {
+	            return step("throw", err);
+	          });
+	        }
+	      }
+
+	      return step("next");
+	    });
+	  };
+	};
+
+	babelHelpers;
+
 	var name = "MDModern";
 	var version = "0.2.0";
 	var license = "GPL-3.0+";
@@ -398,43 +432,59 @@
 
 	  var settings = copy(selectedSettings);
 
-	  // TODO move content back into the function below once 'await' works.
-	  var _post_wait_helper = function _post_wait_helper(resolve, reject) {
-	    if ("session" in settings && settings.session !== currentSettings.session) {
-	      var session = getSession(settings.session);
+	  return apiCallQueue.push(function () {
+	    var ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(resolve, reject) {
+	      var session, language;
+	      return regeneratorRuntime.wrap(function _callee$(_context) {
+	        while (1) {
+	          switch (_context.prev = _context.next) {
+	            case 0:
+	              if (!(settings.user !== currentSettings.user || !passwordExpected)) {
+	                _context.next = 3;
+	                break;
+	              }
 
-	      // no reply expected
-	      alert("SESSION###" + session.name + "###" + session.file);
-	    }
+	              _context.next = 3;
+	              return selectUser(settings.user);
 
-	    if ("language" in settings && settings.language !== currentSettings.language) {
-	      var language = getLanguage(settings.language);
+	            case 3:
 
-	      // no reply expected
-	      alert("LANGUAGE###" + language.code);
-	    }
+	              if ("session" in settings && settings.session !== currentSettings.session) {
+	                session = getSession(settings.session);
 
-	    once$1("error", function (evt, msg) {
-	      reject(msg);
-	      return true;
-	    });
-	    // once("success", resolve); // Not supported by MDM in any meaningful way
+	                // no reply expected
 
-	    passwordExpected = false;
-	    alert("LOGIN###" + password);
-	  };
+	                alert("SESSION###" + session.name + "###" + session.file);
+	              }
 
-	  return apiCallQueue.push( /*async*/function (resolve, reject) {
+	              if ("language" in settings && settings.language !== currentSettings.language) {
+	                language = getLanguage(settings.language);
 
-	    if (settings.user !== currentSettings.user || !passwordExpected) {
-	      // await selectUser(settings.user);
-	      selectUser(settings.user).then(function () {
-	        return _post_wait_helper(resolve, reject);
-	      });
-	    } else {
-	      _post_wait_helper(resolve, reject);
-	    }
-	  });
+	                // no reply expected
+
+	                alert("LANGUAGE###" + language.code);
+	              }
+
+	              once$1("error", function (evt, msg) {
+	                reject(msg);
+	                return true;
+	              });
+	              // once("success", resolve); // Not supported by MDM in any meaningful way
+
+	              passwordExpected = false;
+	              alert("LOGIN###" + password);
+
+	            case 8:
+	            case 'end':
+	              return _context.stop();
+	          }
+	        }
+	      }, _callee, this);
+	    }));
+	    return function (_x, _x2) {
+	      return ref.apply(this, arguments);
+	    };
+	  }());
 	}
 
 	/// SIMPLE SETTERS ///
@@ -995,8 +1045,11 @@ var mdm = Object.freeze({
 	    $loginForm.addClass("hasface");
 	  } else {
 	    $(user.img).one("load", function () {
-	      if (user == selectedUser) faceImgElem.src = user.img.src;
-	      $loginForm.addClass("hasface");
+	      if (user === selectedUser) {
+	        // still relevant?
+	        faceImgElem.src = user.img.src;
+	        $loginForm.addClass("hasface");
+	      }
 	    });
 	  }
 	}

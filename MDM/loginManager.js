@@ -70,8 +70,12 @@ export function sendPassword(password) {
   
   const settings = copy(selectedSettings);
   
-  // TODO move content back into the function below once 'await' works.
-  const _post_wait_helper = function(resolve, reject) {
+  return apiCallQueue.push(async function(resolve, reject) {
+    
+    if (settings.user !== currentSettings.user || !passwordExpected) {
+      await selectUser(settings.user);
+    }
+    
     if ("session" in settings && settings.session !== currentSettings.session) {
       let session = getSession(settings.session);
       
@@ -94,17 +98,6 @@ export function sendPassword(password) {
     
     passwordExpected = false;
     alert("LOGIN###" + password);
-  };
-  
-  return apiCallQueue.push(/*async*/ function(resolve, reject) {
-    
-    if (settings.user !== currentSettings.user || !passwordExpected) {
-      // await selectUser(settings.user);
-      selectUser(settings.user).then(() => _post_wait_helper(resolve, reject));
-    }
-    else {
-      _post_wait_helper(resolve, reject);
-    }
     
   });
   

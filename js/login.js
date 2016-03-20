@@ -141,9 +141,10 @@ function updateFace(user) {
     $loginForm.addClass("hasface");
   } else {
     $(user.img).one("load", function() {
-      if (user == selectedUser)
-      faceImgElem.src = user.img.src;
-      $loginForm.addClass("hasface");
+      if (user === selectedUser) { // still relevant?
+        faceImgElem.src = user.img.src;
+        $loginForm.addClass("hasface");
+      }
     });
   }
 }
