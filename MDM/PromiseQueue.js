@@ -5,6 +5,7 @@
  */
 export default function PromiseQueue() {
   this._items = [];
+  this._running = false;
 }
 
 PromiseQueue.prototype = {
@@ -15,32 +16,42 @@ PromiseQueue.prototype = {
    * @return {Promise}           Promise that will resolve when 
    */
   push(callback) {
-    const p = Promise((resolve, reject) => this._items.push({ callback, resolve, reject }));
-    this._run();
+    const p = new Promise((resolve, reject) => this._items.push({ callback, resolve, reject }));
+    this._start();
     return p;
+  },
+  
+  _start() {
+    // already started
+    if (this._running/* || !this._items.length*/) {
+      return;
+    }
+    this._running = true;
+    this._next();
   },
   
   /**
    * Run the Queue.
    * This means that items will be executed one by one until the queue is empty.
    */
-  _run() {
+  _next() {
     if (!this._items.length) {
+      this._running = false;
       return;
     }
     
-    const p = this._items.shift();
+    const call = this._items.shift();
     const queue = this;
     
-    // p.callback is the user-provided function (see .push)
-    Promise(p.callback).then(
+    // call.callback is the user-provided function (see .push)
+    new Promise(call.callback).then(
       function(...args) {
-        p.resolve.apply(null, args);
-        queue._run();
+        call.resolve(...args);
+        queue._next();
       },
       function(...args) {
-        p.reject.apply(null, args);
-        queue._run();
+        call.reject(...args);
+        queue._next();
       }
     );
   },

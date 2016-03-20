@@ -60,51 +60,54 @@ export function login(user, password, session, language) {
  * @return {Promise}
  */
 export function sendPassword(password) {
-  if ("user" in selectedSettings) {
-    
-    const settings = copy(selectedSettings);
-    
-    // TODO move content back into the function below once 'await' works.
-    const _post_wait_helper = function(resolve, reject) {
-      if ("session" in settings && settings.session !== currentSettings.session) {
-        let session = getSession(settings.session);
-        
-        // no reply expected
-        alert("SESSION###" + session.name + "###" + session.file);
-      }
-      
-      if ("language" in settings && settings.language !== currentSettings.language) {
-        let language = getLanguage(settings.language);
-        
-        // no reply expected
-        alert("LANGUAGE###" + language.code);
-      }
-      
-      once("error", function(evt, msg) {
-        reject(msg);
-        return true;
-      });
-      // once("success", resolve); // Not supported by MDM in any meaningful way
-      
-      passwordExpected = false;
-      alert("LOGIN###" + password);
-    };
-    
-    return apiCallQueue.push(/*async*/ function(resolve, reject) {
-      
-      if (settings.user !== currentSettings.user || !passwordExpected) {
-        // await selectUser(settings.user);
-        selectUser(settings.user).then(() => _post_wait_helper(resolve, reject));
-      }
-      else {
-        _post_wait_helper(resolve, reject);
-      }
-      
-    });
-    
-  } else {
+  
+  if (!password) {
+    return Promise.reject("Password required!");
+  }
+  if (!("user" in selectedSettings)) {
     return Promise.reject("Please chose a login name!");
   }
+  
+  const settings = copy(selectedSettings);
+  
+  // TODO move content back into the function below once 'await' works.
+  const _post_wait_helper = function(resolve, reject) {
+    if ("session" in settings && settings.session !== currentSettings.session) {
+      let session = getSession(settings.session);
+      
+      // no reply expected
+      alert("SESSION###" + session.name + "###" + session.file);
+    }
+    
+    if ("language" in settings && settings.language !== currentSettings.language) {
+      let language = getLanguage(settings.language);
+      
+      // no reply expected
+      alert("LANGUAGE###" + language.code);
+    }
+    
+    once("error", function(evt, msg) {
+      reject(msg);
+      return true;
+    });
+    // once("success", resolve); // Not supported by MDM in any meaningful way
+    
+    passwordExpected = false;
+    alert("LOGIN###" + password);
+  };
+  
+  return apiCallQueue.push(/*async*/ function(resolve, reject) {
+    
+    if (settings.user !== currentSettings.user || !passwordExpected) {
+      // await selectUser(settings.user);
+      selectUser(settings.user).then(() => _post_wait_helper(resolve, reject));
+    }
+    else {
+      _post_wait_helper(resolve, reject);
+    }
+    
+  });
+  
 }
 
 
@@ -173,6 +176,11 @@ export function selectLanguage(language) {
 export function getUser(user) {
   user = typeof user.id === "undefined" ? user : user.id;
   return users.find(usr => usr.id === user);
+  // for (let usr of users) {
+  //   if (usr.id === user) {
+  //     return usr;
+  //   }
+  // }
 }
 
 /**
@@ -183,8 +191,12 @@ export function getUser(user) {
  */
 export function getSession(session) {
   session = typeof session.id === "undefined" ? session : session.id;
-  return users.find(sess => sess.id === session);
-  
+  return sessions.find(sess => sess.id === session);
+  // for (let sess of sessions) {
+  //   if (sess.id === session) {
+  //     return sess;
+  //   }
+  // }
 }
 
 /**
@@ -195,7 +207,12 @@ export function getSession(session) {
  */
 export function getLanguage(language) {
   language = typeof language.id === "undefined" ? language : language.id;
-  return users.find(lang => lang.id === language);
+  return languages.find(lang => lang.id === language);
+  // for (let lang of languages) {
+  //   if (lang.id === language) {
+  //     return lang;
+  //   }
+  // }
 }
 
 
@@ -239,14 +256,14 @@ global.mdm_set_current_user = function(username) {
 
 // Called by MDM to inform about the currently selected session
 global.mdm_set_current_session = function(session_name, session_file) {
-  const session = getSession(session_name) || new Session(session_name, session_file);
+  const session = getSession(session_file) || new Session(session_name, session_file);
   currentSettings.session = session.id;
   trigger("sessionSelected", session);
 };
 
 // Called by MDM to inform about the currently selected language
 global.mdm_set_current_language = function(language_name, language_code) {
-  const language = getLanguage(language_name) || new Language(language_name, language_code);
+  const language = getLanguage(language_code) || new Language(language_name, language_code);
   currentSettings.language = language.id;
   trigger("languageSelected", language);
 };

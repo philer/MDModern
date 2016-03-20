@@ -57,6 +57,7 @@ function once(evt, listener) {
 }
 
 function trigger(evt, ...args) {
+  console.log(evt, ...args);
   if (evt in listeners) {
     const fns = listeners[evt].slice();
     for (let i = 0, len = fns.length ; i < len ; ++i) {

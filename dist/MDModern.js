@@ -7,15 +7,6 @@
 	doc = 'default' in doc ? doc['default'] : doc;
 
 	var undefined;
-
-	var babelHelpers = {};
-	babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-	  return typeof obj;
-	} : function (obj) {
-	  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-	};
-	babelHelpers;
-
 	var name = "MDModern";
 	var version = "0.2.0";
 	var license = "GPL-3.0+";
@@ -67,13 +58,15 @@
 	}
 
 	function trigger(evt) {
+	  var _console;
+
+	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    args[_key - 1] = arguments[_key];
+	  }
+
+	  (_console = console).log.apply(_console, [evt].concat(args));
 	  if (evt in listeners) {
 	    var fns = listeners[evt].slice();
-
-	    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	      args[_key - 1] = arguments[_key];
-	    }
-
 	    for (var i = 0, len = fns.length; i < len; ++i) {
 	      fns[i].apply(fns, [evt].concat(args));
 	    }
@@ -291,6 +284,7 @@
 	 */
 	function PromiseQueue() {
 	  this._items = [];
+	  this._running = false;
 	}
 
 	PromiseQueue.prototype = {
@@ -304,11 +298,19 @@
 	  push: function push(callback) {
 	    var _this = this;
 
-	    var p = Promise(function (resolve, reject) {
+	    var p = new Promise(function (resolve, reject) {
 	      return _this._items.push({ callback: callback, resolve: resolve, reject: reject });
 	    });
-	    this._run();
+	    this._start();
 	    return p;
+	  },
+	  _start: function _start() {
+	    // already started
+	    if (this._running /* || !this._items.length*/) {
+	        return;
+	      }
+	    this._running = true;
+	    this._next();
 	  },
 
 
@@ -316,29 +318,22 @@
 	   * Run the Queue.
 	   * This means that items will be executed one by one until the queue is empty.
 	   */
-	  _run: function _run() {
+	  _next: function _next() {
 	    if (!this._items.length) {
+	      this._running = false;
 	      return;
 	    }
 
-	    var p = this._items.shift();
+	    var call = this._items.shift();
 	    var queue = this;
 
-	    // p.callback is the user-provided function (see .push)
-	    Promise(p.callback).then(function () {
-	      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	        args[_key] = arguments[_key];
-	      }
-
-	      p.resolve.apply(null, args);
-	      queue._run();
+	    // call.callback is the user-provided function (see .push)
+	    new Promise(call.callback).then(function () {
+	      call.resolve.apply(call, arguments);
+	      queue._next();
 	    }, function () {
-	      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	        args[_key2] = arguments[_key2];
-	      }
-
-	      p.reject.apply(null, args);
-	      queue._run();
+	      call.reject.apply(call, arguments);
+	      queue._next();
 	    });
 	  }
 	};
@@ -393,56 +388,53 @@
 	 * @return {Promise}
 	 */
 	function sendPassword(password) {
-	  if ("user" in selectedSettings) {
-	    var _ret = function () {
 
-	      var settings = copy(selectedSettings);
-
-	      // TODO move content back into the function below once 'await' works.
-	      var _post_wait_helper = function _post_wait_helper(resolve, reject) {
-	        if ("session" in settings && settings.session !== currentSettings.session) {
-	          var session = getSession(settings.session);
-
-	          // no reply expected
-	          alert("SESSION###" + session.name + "###" + session.file);
-	        }
-
-	        if ("language" in settings && settings.language !== currentSettings.language) {
-	          var language = getLanguage(settings.language);
-
-	          // no reply expected
-	          alert("LANGUAGE###" + language.code);
-	        }
-
-	        once$1("error", function (evt, msg) {
-	          reject(msg);
-	          return true;
-	        });
-	        // once("success", resolve); // Not supported by MDM in any meaningful way
-
-	        passwordExpected = false;
-	        alert("LOGIN###" + password);
-	      };
-
-	      return {
-	        v: apiCallQueue.push( /*async*/function (resolve, reject) {
-
-	          if (settings.user !== currentSettings.user || !passwordExpected) {
-	            // await selectUser(settings.user);
-	            selectUser(settings.user).then(function () {
-	              return _post_wait_helper(resolve, reject);
-	            });
-	          } else {
-	            _post_wait_helper(resolve, reject);
-	          }
-	        })
-	      };
-	    }();
-
-	    if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
-	  } else {
+	  if (!password) {
+	    return Promise.reject("Password required!");
+	  }
+	  if (!("user" in selectedSettings)) {
 	    return Promise.reject("Please chose a login name!");
 	  }
+
+	  var settings = copy(selectedSettings);
+
+	  // TODO move content back into the function below once 'await' works.
+	  var _post_wait_helper = function _post_wait_helper(resolve, reject) {
+	    if ("session" in settings && settings.session !== currentSettings.session) {
+	      var session = getSession(settings.session);
+
+	      // no reply expected
+	      alert("SESSION###" + session.name + "###" + session.file);
+	    }
+
+	    if ("language" in settings && settings.language !== currentSettings.language) {
+	      var language = getLanguage(settings.language);
+
+	      // no reply expected
+	      alert("LANGUAGE###" + language.code);
+	    }
+
+	    once$1("error", function (evt, msg) {
+	      reject(msg);
+	      return true;
+	    });
+	    // once("success", resolve); // Not supported by MDM in any meaningful way
+
+	    passwordExpected = false;
+	    alert("LOGIN###" + password);
+	  };
+
+	  return apiCallQueue.push( /*async*/function (resolve, reject) {
+
+	    if (settings.user !== currentSettings.user || !passwordExpected) {
+	      // await selectUser(settings.user);
+	      selectUser(settings.user).then(function () {
+	        return _post_wait_helper(resolve, reject);
+	      });
+	    } else {
+	      _post_wait_helper(resolve, reject);
+	    }
+	  });
 	}
 
 	/// SIMPLE SETTERS ///
@@ -511,6 +503,11 @@
 	  return users.find(function (usr) {
 	    return usr.id === user;
 	  });
+	  // for (let usr of users) {
+	  //   if (usr.id === user) {
+	  //     return usr;
+	  //   }
+	  // }
 	}
 
 	/**
@@ -521,9 +518,14 @@
 	 */
 	function getSession(session) {
 	  session = typeof session.id === "undefined" ? session : session.id;
-	  return users.find(function (sess) {
+	  return sessions.find(function (sess) {
 	    return sess.id === session;
 	  });
+	  // for (let sess of sessions) {
+	  //   if (sess.id === session) {
+	  //     return sess;
+	  //   }
+	  // }
 	}
 
 	/**
@@ -534,9 +536,14 @@
 	 */
 	function getLanguage(language) {
 	  language = typeof language.id === "undefined" ? language : language.id;
-	  return users.find(function (lang) {
+	  return languages.find(function (lang) {
 	    return lang.id === language;
 	  });
+	  // for (let lang of languages) {
+	  //   if (lang.id === language) {
+	  //     return lang;
+	  //   }
+	  // }
 	}
 
 	/// BACKEND API ///
@@ -578,14 +585,14 @@
 
 	// Called by MDM to inform about the currently selected session
 	global.mdm_set_current_session = function (session_name, session_file) {
-	  var session = getSession(session_name) || new Session(session_name, session_file);
+	  var session = getSession(session_file) || new Session(session_name, session_file);
 	  currentSettings.session = session.id;
 	  trigger$1("sessionSelected", session);
 	};
 
 	// Called by MDM to inform about the currently selected language
 	global.mdm_set_current_language = function (language_name, language_code) {
-	  var language = getLanguage(language_name) || new Language(language_name, language_code);
+	  var language = getLanguage(language_code) || new Language(language_name, language_code);
 	  currentSettings.language = language.id;
 	  trigger$1("languageSelected", language);
 	};
@@ -1073,9 +1080,9 @@ var mdm = Object.freeze({
 	 * @return {publicAPI}          chainable
 	 */
 	function addLanguage(evt, language) {
-	  language.$li = $("<li>").append($('<a>\n          <span class="code">{language.countryCode()}</span>\n          <span class="name">{language.name}</span>\n        </a>').click(language.select.bind(language)));
+	  language.$li = $("<li>").append($('<a>\n          <span class="code">' + language.countryCode() + '</span>\n          <span class="name">' + language.name + '</span>\n        </a>').click(language.select.bind(language)));
 
-	  $languagesUl.append(language.li);
+	  $languagesUl.append(language.$li);
 
 	  // show first language by default
 	  if (!selectedLanguage) {

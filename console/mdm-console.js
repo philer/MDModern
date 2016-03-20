@@ -62,4 +62,6 @@
     
   });
   
+  win.alert = htmlConsole.track("alert", win.alert);
+  
 })(window, htmlConsole);

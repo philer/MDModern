@@ -30,13 +30,13 @@ function addLanguage(evt, language) {
   language.$li = $("<li>")
     .append(
       $(`<a>
-          <span class="code">{language.countryCode()}</span>
-          <span class="name">{language.name}</span>
+          <span class="code">${language.countryCode()}</span>
+          <span class="name">${language.name}</span>
         </a>`)
       .click(language.select.bind(language))
     );
   
-  $languagesUl.append(language.li);
+  $languagesUl.append(language.$li);
   
   // show first language by default
   if (!selectedLanguage) {
