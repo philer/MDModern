@@ -1,21 +1,36 @@
+/**
+ * This file will fade out a screen-covering element to create a smooth
+ * start-up effect.
+ * 
+ * @author Philipp Miller
+ * 
+ */
+
 import win from 'window';
 import $ from 'jQuery';
 import {on, off} from '../MDM/index.js';
 
 
 function uncover() {
-  const $cover = $("#fade-in-cover");
   
-  // using css transition instead of $.fn.fadeOut
-  $cover.addClass('ready');
-  
-  // delay for animation duration
+  // there is a little delay before MDM's backend uncovers the screen.
   win.setTimeout(function() {
-    $cover.remove();
-  }, 1000);
+    
+    const $cover = $("#fade-in-cover");
+    
+    // using css transition instead of $.fn.fadeOut
+    $cover.addClass("ready");
+
+    // delay for animation duration
+    win.setTimeout(function() {
+      $cover.remove();
+    }, 1000);
+
+    win.clearTimeout(id);
+    off("ready", uncover);
+    
+  }, 1500);
   
-  win.clearTimeout(id);
-  off("ready", uncover);
 }
 
 on("ready", uncover);
@@ -24,4 +39,4 @@ on("ready", uncover);
 const id = win.setTimeout(function() {
   console.log("MDM ready timeout");
   uncover();
-}, 5000);
+}, 3000);

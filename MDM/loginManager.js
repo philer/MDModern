@@ -28,7 +28,6 @@ let passwordExpected = false;
 // utility: create a shallow copy of an object including prototype
 const copy = obj => Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
 
-
 /// LOGIN API ///
 
 /**
@@ -47,7 +46,9 @@ export function login(user, password, session, language) {
       selectLanguage(language);
     }
   }
-  selectUser(user);
+  if (!selectedSettings.user || selectedSettings.user !== (user.id || user)) {
+    selectUser(user);
+  }
   return sendPassword(password);
 }
 
@@ -64,13 +65,13 @@ export function sendPassword(password) {
   if (!password) {
     return Promise.reject("Password required!");
   }
-  if (!("user" in selectedSettings)) {
+  if (!selectedSettings.user) {
     return Promise.reject("Please chose a login name!");
   }
   
   const settings = copy(selectedSettings);
   
-  return apiCallQueue.push(async function(resolve, reject) {
+  return apiCallQueue.push(async function(resolve/*, reject*/) {
     
     if (settings.user !== currentSettings.user || !passwordExpected) {
       await selectUser(settings.user);
@@ -90,11 +91,12 @@ export function sendPassword(password) {
       alert("LANGUAGE###" + language.code);
     }
     
-    once("error", function(evt, msg) {
-      reject(msg);
+    once("passwordPrompt", function() {
+      // we resolve instead of rejecting since this is currently the only
+      // relevant case. If the attempt succeeds we get terminated immediately.
+      resolve("Login attempt failed");
       return true;
     });
-    // once("success", resolve); // Not supported by MDM in any meaningful way
     
     passwordExpected = false;
     alert("LOGIN###" + password);
@@ -167,13 +169,8 @@ export function selectLanguage(language) {
  * @return {User}
  */
 export function getUser(user) {
-  user = typeof user.id === "undefined" ? user : user.id;
+  user = user.id || user;
   return users.find(usr => usr.id === user);
-  // for (let usr of users) {
-  //   if (usr.id === user) {
-  //     return usr;
-  //   }
-  // }
 }
 
 /**
@@ -183,13 +180,8 @@ export function getUser(user) {
  * @return {Session}
  */
 export function getSession(session) {
-  session = typeof session.id === "undefined" ? session : session.id;
+  session = session.id || session;
   return sessions.find(sess => sess.id === session);
-  // for (let sess of sessions) {
-  //   if (sess.id === session) {
-  //     return sess;
-  //   }
-  // }
 }
 
 /**
@@ -199,14 +191,10 @@ export function getSession(session) {
  * @return {Language}
  */
 export function getLanguage(language) {
-  language = typeof language.id === "undefined" ? language : language.id;
+  language = language.id || language;
   return languages.find(lang => lang.id === language);
-  // for (let lang of languages) {
-  //   if (lang.id === language) {
-  //     return lang;
-  //   }
-  // }
 }
+
 
 
 /// BACKEND API ///
@@ -242,6 +230,23 @@ global.mdm_add_language = function(language_name, language_code) {
 
 // Called by MDM to inform about the currently selected user
 global.mdm_set_current_user = function(username) {
+  
+  // MDM clears the selected user after three failed login attempts
+  // (or after one if the username was sent via LOGIN###).
+  // We capture the call internally and re-select the user.
+  if (!username && selectedSettings.user) {
+    
+    // capture the upcoming username prompt
+    // note: be sure not to use the usernamePrompt event interally
+    once("usernamePrompt", () => false);
+    once("prompt", () => false);
+    
+    // send the username immediately, bypassing the queue
+    alert("USER###" + selectedSettings.user);
+    
+    return;
+  }
+  
   const user = getUser(username) || new User(username);
   currentSettings.user = user.id;
   trigger("userSelected", user);
@@ -263,17 +268,17 @@ global.mdm_set_current_language = function(language_name, language_code) {
 
 
 // Called by MDM when expecting a username via alert("LOGIN###...")
-global.mdm_prompt = function(/*message*/) {
+global.mdm_prompt = function(message) {
   passwordExpected = false;
-  trigger("usernamePrompt");
-  // trigger("prompt");
+  trigger("prompt", message);
+  trigger("usernamePrompt", message);
 };
 
 // Called by MDM when expecting a password via alert("LOGIN###...")
-global.mdm_noecho = function(/*message*/) {
+global.mdm_noecho = function(message) {
   passwordExpected = true;
-  trigger("passwordPrompt");
-  // trigger("prompt");
+  trigger("prompt", message);
+  trigger("passwordPrompt", message);
 };
 
 

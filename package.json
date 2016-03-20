@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "prebuild": "npm run lint",
+    "build:dist": "NODE_ENV=production rollup -c",
+    "prebuild:dist": "npm run lint",
     "lint": "eslint --color='true' --format 'node_modules/eslint-friendly-formatter' js/** MDM/**"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "rollup": "~0.25.4",
     "rollup-plugin-babel": "~2.4.0",
     "rollup-plugin-json": "~2.0.0",
+    "rollup-plugin-multi-entry": "^1.2.0",
     "rollup-plugin-uglify": "~0.3.1"
   },
   "eslintConfig": {

@@ -13,21 +13,20 @@
   
   var template = '<pre id="console-log"></pre>'
       + '<form id="console-form"><input id="console-input" type="text" autocomplete="off"/>'
-      + '<button>»</button></form>'
+      + '<button>»</button></form>';
     
-    , defaultDepth = 1
+  var defaultDepth = 1;
     
-    , getById     = doc.getElementById.bind(doc)
-    , createElem  = doc.createElement.bind(doc)
-    
-    , rollback    = []
-    , rollbackId  = 0
-    
-    , consoleElem = getById("console")
-    , inputElem
-    , logElem
-    ;
+  var getById     = doc.getElementById.bind(doc);
+  var createElem  = doc.createElement.bind(doc);
   
+  var rollback    = [];
+  var rollbackId  = 0;
+  
+  var consoleElem;
+  var styleElem;
+  var inputElem;
+  var logElem;
   
   var console
       = win.console
@@ -116,10 +115,21 @@
   /// INIT
   
   function init() {
+    styleElem = getById("console-style");
+    if (!styleElem) {
+      styleElem = createElem("link");
+      styleElem.rel = "stylesheet";
+      styleElem.href = "console/console.css";
+      styleElem.id = "console-style";
+      doc.head.appendChild(styleElem);
+    }
+    
+    consoleElem = getById("console");
     if (!consoleElem) {
       consoleElem = doc.body.appendChild(createElem("div"));
       consoleElem.id = "console";
     }
+    
     consoleElem.innerHTML = template;
     inputElem = getById("console-input");
     logElem   = getById("console-log");

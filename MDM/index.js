@@ -28,13 +28,5 @@ export * from './messages.js';
  * We fire an event once we're sure MDM is (mostly) done with its setup.
  * Use this event to start for things like start-up animations.
  */
-import {on, off, trigger} from './events.js';
-
-function triggerReady() {
-  off("usernamePrompt", triggerReady);
-  off("passwordPrompt", triggerReady);
-  trigger("ready");
-}
-
-on("usernamePrompt", triggerReady);
-on("passwordPrompt", triggerReady);
+import {once, trigger} from './events.js';
+once("prompt", () => trigger("ready"));
