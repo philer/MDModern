@@ -8,8 +8,9 @@
  * 
  */
 
-import * as mdm from '../MDM/index.js';
 import $ from 'jQuery';
+import * as mdm from '../MDM/index.js';
+import {prepare as prepareMessage} from './messages.js';
 
 const $body            = $(document.body);
 const $loginForm       = $("#login");
@@ -47,6 +48,7 @@ $loginForm.submit(login);
  */
 function login(evt) {
   evt.preventDefault();
+  prepareMessage("checking...");
   mdm.login($username[0].value, $password[0].value);
   $password.select();
 }

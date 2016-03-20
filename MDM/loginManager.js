@@ -91,10 +91,13 @@ export function sendPassword(password) {
       alert("LANGUAGE###" + language.code);
     }
     
+    let errorMessage;
+    once("error", (evt, msg) => errorMessage = msg);
+    
     once("passwordPrompt", function() {
       // we resolve instead of rejecting since this is currently the only
       // relevant case. If the attempt succeeds we get terminated immediately.
-      resolve("Login attempt failed");
+      resolve(errorMessage);
       return true;
     });
     

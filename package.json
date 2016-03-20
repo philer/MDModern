@@ -7,10 +7,14 @@
     "url": "http://github.com/philer"
   },
   "scripts": {
-    "build": "rollup -c",
-    "build:dist": "NODE_ENV=production rollup -c",
-    "prebuild:dist": "npm run lint",
-    "lint": "eslint --color='true' --format 'node_modules/eslint-friendly-formatter' js/** MDM/**"
+    "build": "npm run build:js && npm run build:css",
+    "dist": "npm run dist:js && npm run dist:css",
+    "lint": "eslint --color='true' --format 'node_modules/eslint-friendly-formatter' js/** MDM/**",
+    "build:js": "rollup -c",
+    "prebuild:js": "npm run lint",
+    "dist:js": "NODE_ENV=production npm run build:js",
+    "build:css": "lessc --strict-math=on --source-map less/theme.less dist/MDModern.css",
+    "dist:css": "npm run build:css -- --clean-css"
   },
   "dependencies": {},
   "devDependencies": {
@@ -21,6 +25,8 @@
     "eslint": "~2.4.0",
     "eslint-friendly-formatter": "~1.2.2",
     "jquery": "~2.2.1",
+    "less": "^2.6.1",
+    "less-plugin-clean-css": "^1.5.1",
     "rollup": "~0.25.4",
     "rollup-plugin-babel": "~2.4.0",
     "rollup-plugin-json": "~2.0.0",
